@@ -8,7 +8,7 @@ import {
   DialogBody,
 } from "@material-tailwind/react";
 import Link from "next/link";
-import ButtonCustom from "@/app/components/Button";
+import ButtonCustom from "@/components/Button";
 import { MdCancel } from "react-icons/md";
 
 const navLinks = [
