@@ -2,3 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+
+
+:root {
+    --color-primary: #FF8A00;
+    --color-primary-dark: #DF851B;
+    --color-navbar: #615D5D;
+}
+
+
+html  {
+    font-family: var(--font-poppins);
+}
+
+h1 {
+    font-family: var(--font-roboto);
+}
+
+body {
+    overflow-x: hidden;
+    box-sizing: border-box;
+}

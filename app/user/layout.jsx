@@ -1,15 +1,12 @@
 import CustomNavbar from "@/components/Navbar";
+import Footer from "@/components/footer";
 
-
-export default function DashboardLayout({
-                                            children, // will be a page or nested layout
-                                        }) {
-    return (
-        <section>
-            {/* Include shared UI here e.g. a header or sidebar */}
-            <CustomNavbar/>
-
-            {children}
-        </section>
-    )
+export default function DashboardLayout({ children }) {
+  return (
+    <section>
+      <CustomNavbar />
+      {children}
+      {/*<Footer />*/}
+    </section>
+  );
 }

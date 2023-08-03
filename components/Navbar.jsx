@@ -10,17 +10,21 @@ import {
 import Link from "next/link";
 import ButtonCustom from "@/components/Button";
 import { MdCancel } from "react-icons/md";
+import { usePathname } from "next/navigation";
 
 const navLinks = [
-  { title: "Home", link: "/en", hreflang: "en" },
-  { title: "FAQ", link: "/en/faq", hreflang: "en" },
-  { title: "About Us", link: "/en/about-us", hreflang: "en" },
-  { title: "Contact Us", link: "/en/contact-us", hreflang: "en" },
+  { title: "Vets", link: "/user/vets" },
+  { title: "Symptoms", link: "/user/symptoms" },
+  { title: "Home Service", link: "/user/home-service" },
+  { title: "Subscription", link: "/user/subscription" },
+  { title: "Review", link: "/user/review" },
+  { title: "Blogs", link: "/user/blogs" },
 ];
 
 export default function CustomNavbar() {
   const [openNav, setOpenNav] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     window.addEventListener(
@@ -38,17 +42,22 @@ export default function CustomNavbar() {
   }, []);
 
   const navList = (
-    <ul className="  mb-4 mt-2 flex flex-col  lg:my-0 lg:flex-row lg:justify-between lg:items-center lg:gap-x-14 ">
+    <ul className="  mb-4 mt-4 flex flex-col  lg:my-0 2xl:flex-row lg:justify-evenly lg:items-center lg:gap-x-14">
       {navLinks.map((link, index) => (
         <li key={index}>
-          <Link
-            href={link.link}
-            hrefLang={link.hreflang}
-            className={`text-lg md:text-xl  text-color-navbar  hover:text-primary-dark transition-all`}
-            onClick={() => setOpenNav(false)}
-          >
-            {link.title}
-          </Link>
+          <li key={index}>
+            <Link
+              href={link.link}
+              className={`text-lg ${
+                pathname === link.link
+                  ? "text-primary border-b-2 border-b-primary"
+                  : "text-color-navbar"
+              }   hover:text-primary-dark transition-all`}
+              onClick={() => setOpenNav(false)}
+            >
+              {link.title}
+            </Link>
+          </li>
         </li>
       ))}
     </ul>
@@ -99,31 +108,31 @@ export default function CustomNavbar() {
 
   return (
     <Navbar
-      className={`fixed left-1/2 -translate-x-1/2 top-0 py-2 px-4 lg:px-8 lg:py-4 font-roboto text-lg mb-5 bg-white  max-w-full z-[1000] ${
+      className={`fixed left-1/2 -translate-x-1/2 top-0 py-2 px-4 lg:px-8 lg:py-4 font-roboto text-lg mb-5 bg-white min-w-full  max-w-full z-[1000] ${
         scrolled ? " shadow-lg " : "shadow-none"
       } `}
     >
       <div className="container mx-auto flex items-center justify-between text-blue-gray-900 ">
-        <Link href={"/en"} hrefLang={"en"}>
+        <Link href={"/user"} hrefLang={"en"}>
           <img
-            src={"/assets/mimi_logo_no_text.webp"}
+            src={"/assets/logo.png"}
             alt={"Mimiplan Logo"}
-            width={60}
-            height={60}
+            width={150}
+            // height={20}
           />
         </Link>
 
-        <div className="hidden lg:block">{navList}</div>
+        <div className="hidden 2xl:block mt-3">{navList}</div>
         <a
           href={"https://web.mimiplan.com"}
           rel={"noreferrer"}
-          className="hidden lg:block"
+          className="hidden 2xl:block"
         >
           <ButtonCustom>Login</ButtonCustom>
         </a>
         <IconButton
           variant="text"
-          className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent lg:hidden"
+          className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent 2xl:hidden"
           ripple={false}
           onClick={() => setOpenNav(!openNav)}
         >

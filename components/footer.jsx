@@ -1,6 +1,5 @@
 "use client";
 import React from "react";
-import world from "@/public/assets/language 1.webp";
 import logo from "@/app/favicon.ico";
 import {
   Button,
