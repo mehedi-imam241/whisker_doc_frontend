@@ -9,15 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.17",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
     "@material-tailwind/react": "^2.0.8",
+    "@mui/material": "^5.14.3",
+    "@tinymce/tinymce-react": "^4.3.0",
     "autoprefixer": "10.4.14",
     "eslint": "8.46.0",
     "eslint-config-next": "13.4.12",
+    "graphql": "^16.7.1",
+    "js-cookie": "^3.0.5",
     "next": "13.4.12",
     "postcss": "8.4.27",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.45.2",
     "react-icons": "^4.10.1",
+    "sweetalert2": "^11.7.20",
+    "sweetalert2-react-content": "^5.0.7",
     "tailwindcss": "3.3.3"
   },
   "devDependencies": {

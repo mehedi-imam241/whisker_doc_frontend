@@ -45,19 +45,17 @@ export default function CustomNavbar() {
     <ul className="  mb-4 mt-4 flex flex-col  lg:my-0 2xl:flex-row lg:justify-evenly lg:items-center lg:gap-x-14">
       {navLinks.map((link, index) => (
         <li key={index}>
-          <li key={index}>
-            <Link
-              href={link.link}
-              className={`text-lg ${
-                pathname === link.link
-                  ? "text-primary border-b-2 border-b-primary"
-                  : "text-color-navbar"
-              }   hover:text-primary-dark transition-all`}
-              onClick={() => setOpenNav(false)}
-            >
-              {link.title}
-            </Link>
-          </li>
+          <Link
+            href={link.link}
+            className={`text-lg ${
+              pathname === link.link
+                ? "text-primary border-b-2 border-b-primary"
+                : "text-color-navbar"
+            }   hover:text-primary-dark transition-all`}
+            onClick={() => setOpenNav(false)}
+          >
+            {link.title}
+          </Link>
         </li>
       ))}
     </ul>

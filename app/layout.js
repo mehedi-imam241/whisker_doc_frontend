@@ -1,10 +1,6 @@
 import "./globals.css";
 import { poppins, roboto, roboto_condensed, rubik } from "@/app/fonts";
-
-export const metadata = {
-  title: "Whisker Docs",
-  description: "Home service",
-};
+import GraphQLWrapper from "@/app/graphql_wrapper";
 
 export default function RootLayout({ children }) {
   return (
@@ -12,7 +8,9 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${roboto.variable} ${roboto_condensed.variable} ${poppins.variable} ${rubik.variable}`}
     >
-      <body>{children}</body>
+      <body className={"mx-5"}>
+        <GraphQLWrapper>{children}</GraphQLWrapper>
+      </body>
     </html>
   );
 }

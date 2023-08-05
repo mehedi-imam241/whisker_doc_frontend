@@ -1,9 +1,8 @@
-import Image from 'next/image'
+export const metadata = {
+  title: "Whisker Docs",
+  description: "The complete treatment for your pet's health",
+};
 
 export default function Home() {
-  return (
-    <main>
-      hello world
-    </main>
-  )
+  return <main>hello world</main>;
 }
