@@ -2,7 +2,6 @@
 import React from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Avatar, Card, Typography } from "@material-tailwind/react";
-import Cookies from "js-cookie";
 import ButtonCustom from "@/components/Button";
 import Link from "next/link";
 
@@ -14,14 +13,6 @@ const FETCH_VET = gql`
       name
       role
       _id
-    }
-  }
-`;
-
-const IS_SLOT_CREATED = gql`
-  query IsSlotCreated {
-    IsSlotCreated {
-      message
     }
   }
 `;
@@ -41,26 +32,20 @@ const TABLE_ROWS = (params) => [
   },
 ];
 
-export default function Page() {
-  const USER = JSON.parse(Cookies.get("user"));
-
+export default function Page({ params }) {
   const { loading, error, data } = useQuery(FETCH_VET, {
     variables: {
-      getVetId: USER._id,
+      getVetId: params.vet_id,
     },
   });
-
-  const { data: isSlotCreated, loading: loadingSlot } =
-    useQuery(IS_SLOT_CREATED);
-
-  if (loadingSlot || loading) return <p>Loading...</p>;
-
   return (
-    <div className={"text-center "}>
+    <div className={"text-center"}>
+      {loading && <p>Loading...</p>}
+
       {data && (
         <>
           <h2 className={" text-2xl font-bold text-semi-blue mb-10"}>
-            My Profile
+            Vet Profile
           </h2>
 
           <div
@@ -109,17 +94,13 @@ export default function Page() {
               </table>
             </Card>
           </div>
+          <Link
+            href={"/user/vets/[vet_id]/book_slots"}
+            as={`/user/vets/${params.vet_id}/book_slots`}
+          >
+            <ButtonCustom className={"mt-16"}>Request Appointment</ButtonCustom>
+          </Link>
         </>
-      )}
-
-      {isSlotCreated.IsSlotCreated.message === "0" ? (
-        <Link href={"/vet/slots/create"}>
-          <ButtonCustom className={"mt-10"}>Provide Slots</ButtonCustom>
-        </Link>
-      ) : (
-        <Link href={"/vet/slots/update"}>
-          <ButtonCustom className={"mt-10"}>Update Slots</ButtonCustom>
-        </Link>
       )}
     </div>
   );

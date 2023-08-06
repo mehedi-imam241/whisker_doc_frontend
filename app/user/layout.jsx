@@ -1,5 +1,6 @@
 import CustomNavbar from "@/components/Navbar";
 import Footer from "@/components/footer";
+import Script from "next/script";
 
 export const metadata = {
   title: "My Dashboard",
