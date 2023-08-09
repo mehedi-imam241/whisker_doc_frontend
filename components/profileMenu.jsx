@@ -6,8 +6,12 @@ import {
   Avatar,
   Typography,
 } from "@material-tailwind/react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 export function ProfileMenu() {
+  const router = useRouter();
+
   return (
     <Menu>
       <MenuHandler>
@@ -101,7 +105,21 @@ export function ProfileMenu() {
           </Typography>
         </MenuItem>
         <hr className="my-2 border-blue-gray-50" />
-        <MenuItem className="flex items-center gap-2 ">
+        <MenuItem
+          className="flex items-center gap-2 "
+          onClick={() => {
+            console.log("sign out");
+            Cookies.remove("user", {
+              path: "/",
+              domain: "localhost",
+            }); // removed!
+            Cookies.remove("accessToken", {
+              path: "/",
+              domain: "localhost",
+            }); // removed!
+            router.replace("/login");
+          }}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

@@ -49,7 +49,7 @@ function Page(props) {
   return (
     <div className={""}>
       <Link
-        href={"/user/blogs/create"}
+        href={"/vet/blogs/create"}
         className={"flex justify-center items-center"}
       >
         <ButtonCustom className={""}>Create Blog</ButtonCustom>
@@ -90,7 +90,7 @@ function Page(props) {
                 </div>
               </CardBody>
               <CardFooter className="pt-0">
-                <Link href={`/user/blogs/${blog._id}`} className="inline-block">
+                <Link href={`/vet/blogs/${blog._id}`} className="inline-block">
                   <Button
                     size="sm"
                     variant="text"

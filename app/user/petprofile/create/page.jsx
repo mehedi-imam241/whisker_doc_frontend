@@ -80,7 +80,7 @@ function Page(props) {
     }
     // reset();
 
-    window.location.href = "/user/petprofile";
+    window.location.href = "/user";
   };
 
   return (

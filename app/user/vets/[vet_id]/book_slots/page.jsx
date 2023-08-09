@@ -3,11 +3,11 @@ import React, { useState } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import slots from "@/utils/slots";
 import {
-  Button,
-  Select,
-  Option,
   Avatar,
+  Button,
   Card,
+  Option,
+  Select,
   Typography,
 } from "@material-tailwind/react";
 import Swal from "sweetalert2";
@@ -68,11 +68,12 @@ const TABLE_ROWS = (params) => [
 
 function Page({ params }) {
   const curr = new Date();
-  curr.setDate(curr.getDate());
+  curr.setDate(curr.getDate() + 1);
   const today = curr.toISOString().substring(0, 10);
 
   const [date, setDate] = useState(today);
   const [slot, setSlot] = useState();
+
   const [type, setType] = useState("");
   const [petId, setPetId] = useState("");
 
@@ -100,14 +101,34 @@ function Page({ params }) {
   if (loading || petsLoading || loadingVET) return <p>Loading...</p>;
   if (error || petsError) return <p>Error :(</p>;
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!date || !slot || !type || !petId) {
+  const handleSubmit = async () => {
+    if (!date || slot === undefined || !type || !petId) {
       await MySwal.fire({
         icon: "error",
         title: "Oops...",
         text: "Please fill all the fields!",
+      });
+
+      return;
+    }
+
+    const diffTime = new Date(date) - new Date(today);
+    const diffDays = Math.ceil(Math.abs(diffTime) / (1000 * 60 * 60 * 24));
+
+    if (diffTime < 0) {
+      await MySwal.fire({
+        icon: "error",
+        title: "Cannot book appointment",
+        text: "you can't book an appointment in the past",
+      });
+
+      return;
+    }
+    if (diffDays > 2) {
+      await MySwal.fire({
+        icon: "error",
+        title: "Cannot book appointment",
+        text: "you can book an appointment at most 2 days ago",
       });
 
       return;
@@ -126,7 +147,6 @@ function Page({ params }) {
         },
       });
 
-      console.log(data);
       await MySwal.fire({
         icon: "success",
         title: "Success",
@@ -214,7 +234,7 @@ function Page({ params }) {
           {data.FindSlotsThatAreNotBooked.ids.map((id, index) => (
             <Option
               key={index}
-              value={id.toString()}
+              value={id + ""}
               onClick={() => {
                 setSlot(id);
               }}
