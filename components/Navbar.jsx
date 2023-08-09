@@ -11,6 +11,7 @@ import Link from "next/link";
 import ButtonCustom from "@/components/Button";
 import { MdCancel } from "react-icons/md";
 import { usePathname } from "next/navigation";
+import { ProfileMenu } from "@/components/profileMenu";
 
 const navLinks = [
   { title: "Vets", link: "/user/vets" },
@@ -121,13 +122,9 @@ export default function CustomNavbar() {
         </Link>
 
         <div className="hidden 2xl:block mt-3">{navList}</div>
-        <a
-          href={"https://web.mimiplan.com"}
-          rel={"noreferrer"}
-          className="hidden 2xl:block"
-        >
-          <ButtonCustom>Login</ButtonCustom>
-        </a>
+
+        <ProfileMenu />
+
         <IconButton
           variant="text"
           className="ml-auto h-6 w-6 text-inherit hover:bg-transparent focus:bg-transparent active:bg-transparent 2xl:hidden"

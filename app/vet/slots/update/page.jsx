@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { Button, Checkbox } from "@material-tailwind/react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import slots from "@/utils/slots";
 
 import Swal from "sweetalert2";
@@ -17,15 +17,37 @@ const CREATE_SLOT = gql`
   }
 `;
 
+const GET_SLOTS = gql`
+  query Query {
+    getAppointmentSlotsOfVet {
+      slots {
+        slots {
+          idx
+        }
+      }
+    }
+  }
+`;
+
 function Page(props) {
+  const { data, loading, error } = useQuery(GET_SLOTS);
+  const [updateAppointmentSlot] = useMutation(CREATE_SLOT);
+
   const [checked, setChecked] = React.useState([]);
 
-  const [updateAppointmentSlot, { data, loading, error }] =
-    useMutation(CREATE_SLOT);
+  useEffect(() => {
+    if (data) {
+      setChecked(
+        data.getAppointmentSlotsOfVet.slots.slots.map((slot) => slot.idx),
+      );
+    }
+
+    console.log(data);
+  }, [data]);
+
+  if (loading) return <div>Loading...</div>;
 
   const handleSubmit = async () => {
-    setChecked((checked) => checked.sort((a, b) => a - b));
-
     if (checked.length === 0) {
       await MySwal.fire({
         icon: "error",
@@ -45,7 +67,6 @@ function Page(props) {
         },
       });
 
-      console.log(data);
       await MySwal.fire({
         icon: "success",
         title: "Success",

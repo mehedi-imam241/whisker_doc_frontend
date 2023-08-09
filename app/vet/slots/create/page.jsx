@@ -23,8 +23,6 @@ function Page(props) {
   const [createSlot, { data, loading, error }] = useMutation(CREATE_SLOT);
 
   const handleSubmit = async () => {
-    setChecked((checked) => checked.sort((a, b) => a - b));
-
     if (checked.length === 0) {
       await MySwal.fire({
         icon: "error",

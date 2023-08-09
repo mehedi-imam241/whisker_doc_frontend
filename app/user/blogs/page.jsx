@@ -36,13 +36,14 @@ const PAGE_COUNT = gql`
 function Page(props) {
   const [skip, setSkip] = React.useState(0);
 
-  const { data: dataPageCount } = useQuery(PAGE_COUNT);
+  const { data: dataPageCount, loading: loadingPageCOung } =
+    useQuery(PAGE_COUNT);
 
   const { loading, error, data } = useQuery(GET_BLOGS, {
     variables: { take: 10, skip: skip },
   });
 
-  if (loading) return "Loading...";
+  if (loading || loadingPageCOung) return "Loading...";
   if (error) return `Error! ${error.message}`;
 
   return (
