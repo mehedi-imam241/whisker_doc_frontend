@@ -13,7 +13,10 @@ import {
 } from "@material-tailwind/react";
 import { Pagination } from "@mui/material";
 import Link from "next/link";
-import dynamic from "next/dynamic";
+import MyMap from "@/components/map";
+
+// import dynamic from "next/dynamic";
+// import MapComponent from "@/components/map.component";
 
 // const GET_VETS = gql`
 //   query GetVets($limit: Float!, $skip: Float!) {
@@ -32,10 +35,10 @@ import dynamic from "next/dynamic";
 //   }
 // `;
 
-const Map = dynamic(
-  () => import("@/components/map"), // replace '@components/map' with your component's location
-  { ssr: false } // This line is important. It's what prevents server-side render
-);
+// const Map = dynamic(
+//   () => import("@/components/map"), // replace '@components/map' with your component's location
+//   { ssr: false } // This line is important. It's what prevents server-side render
+// );
 
 function PageUtils(props) {
   const [userLocation, setUserLocation] = useState(center);
@@ -62,8 +65,11 @@ function PageUtils(props) {
       <h1 className={"text-semi-blue font-semibold text-center"}>
         Choose Nearby Vet
       </h1>
+      {/* {mounted && (
+        <Map userLocation={userLocation} setUserLocation={setUserLocation} />
+      )} */}
 
-      <Map userLocation={userLocation} setUserLocation={setUserLocation} />
+      <MyMap userLocation={userLocation} setUserLocation={setUserLocation} />
 
       {/* <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
         {dataPageCount &&
