@@ -7,9 +7,10 @@ import {
   Typography,
 } from "@material-tailwind/react";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { redirect, useRouter } from "next/navigation";
 
-export function ProfileMenu() {
+export function ProfileMenu({ editProfileLink }) {
   const router = useRouter();
 
   return (
@@ -42,7 +43,13 @@ export function ProfileMenu() {
             My Profile
           </Typography>
         </MenuItem>
-        <MenuItem className="flex items-center gap-2">
+        <MenuItem
+          className="flex items-center gap-2"
+          onClick={() => {
+            router.push(editProfileLink);
+          }}
+        >
+          {/* <Link href={editProfileLink} hrefLang={"en"}> */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -65,6 +72,7 @@ export function ProfileMenu() {
           <Typography variant="small" className="font-normal">
             Edit Profile
           </Typography>
+          {/* </Link> */}
         </MenuItem>
         <MenuItem className="flex items-center gap-2">
           <svg

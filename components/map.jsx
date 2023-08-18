@@ -100,23 +100,30 @@ function ChangeView({ center }) {
   return <></>;
 }
 
-const MyMap = ({ userLocation, setUserLocation }) => {
-  const [automaticLocation, setAutomaticLocation] = useState(true);
+const MyMap = ({
+  userLocation,
+  setUserLocation,
+  previous = false,
+  update = true,
+}) => {
+  const [automaticLocation, setAutomaticLocation] = useState(
+    !previous ? true : false
+  ); // 1 for previous location, 2 for GPS location, 3 for manual location
   const [reload, setReload] = useState(false);
 
   // const [newLocation, setNewLocation] = useState(center);
   // const map = useMap();
 
-  useEffect(() => {
-    if ("geolocation" in navigator) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        setUserLocation({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        });
-      });
-    }
-  }, []);
+  // useEffect(() => {
+  //   if ("geolocation" in navigator) {
+  //     navigator.geolocation.getCurrentPosition((position) => {
+  //       setUserLocation({
+  //         lat: position.coords.latitude,
+  //         lng: position.coords.longitude,
+  //       });
+  //     });
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (reload) {
@@ -125,14 +132,16 @@ const MyMap = ({ userLocation, setUserLocation }) => {
   }, [reload]);
 
   useEffect(() => {
-    if (automaticLocation) {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition((position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
+    if (update) {
+      if (automaticLocation === true) {
+        if ("geolocation" in navigator) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            setUserLocation({
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            });
           });
-        });
+        }
       }
     }
   }, [automaticLocation]);
@@ -141,34 +150,42 @@ const MyMap = ({ userLocation, setUserLocation }) => {
 
   return (
     <div className="text-center">
-      <Menu>
-        <MenuHandler className="my-7">
-          <Button color="orange">
-            {automaticLocation ? "Automatic" : "Manual"}
-          </Button>
-        </MenuHandler>
-        <MenuList>
-          <MenuItem
-            onClick={() => {
-              setAutomaticLocation(true);
-            }}
-          >
-            Automatic
-          </MenuItem>
-          <MenuItem
-            onClick={() => {
-              setAutomaticLocation(false);
-            }}
-          >
-            Manual
-          </MenuItem>
-        </MenuList>
-      </Menu>
-      <IconButton className="mx-2" color="orange">
-        <IoReloadCircle onClick={() => setReload(true)} size={30} />
-      </IconButton>
+      {update && (
+        <>
+          <Menu>
+            <MenuHandler className="my-7">
+              <Button
+                color="indigo"
+                variant="outlined"
+                className="rounded-full"
+              >
+                {automaticLocation ? "GPS Location" : "Manual Location"}
+              </Button>
+            </MenuHandler>
+            <MenuList>
+              <MenuItem
+                onClick={() => {
+                  setAutomaticLocation(true);
+                }}
+              >
+                GPS Location
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  setAutomaticLocation(false);
+                }}
+              >
+                Manual Location
+              </MenuItem>
+            </MenuList>
+          </Menu>
+          <IconButton className="mx-2" color="indigo">
+            <IoReloadCircle onClick={() => setReload(true)} size={30} />
+          </IconButton>
+        </>
+      )}
 
-      <div className="w-3/4 mx-auto">
+      <div className={``}>
         {automaticLocation ? (
           <>
             <MapContainer
@@ -204,6 +221,7 @@ const MyMap = ({ userLocation, setUserLocation }) => {
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              <ChangeView center={userLocation} />
               {/* <Marker position={[newLocation[1], newLocation[0]]}>
           <Popup>
             A pretty CSS3 popup. <br /> Easily customizable.

@@ -28,7 +28,7 @@ export default function CustomNavbar() {
   useEffect(() => {
     window.addEventListener(
       "resize",
-      () => window.innerWidth >= 654 && setOpenNav(false),
+      () => window.innerWidth >= 654 && setOpenNav(false)
     );
 
     window.onscroll = function () {
@@ -110,7 +110,7 @@ export default function CustomNavbar() {
       } `}
     >
       <div className="container mx-auto flex items-center justify-between text-blue-gray-900 ">
-        <Link href={"/user"} hrefLang={"en"}>
+        <Link href={"/vet"} hrefLang={"en"}>
           <img
             src={"/assets/logo.png"}
             alt={"Mimiplan Logo"}
@@ -121,7 +121,7 @@ export default function CustomNavbar() {
 
         <div className="hidden 2xl:block mt-3">{navList}</div>
 
-        <ProfileMenu />
+        <ProfileMenu editProfileLink={"/vet/edit-profile"} />
 
         <IconButton
           variant="text"
