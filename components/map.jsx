@@ -16,11 +16,10 @@ import { OpenStreetMapProvider, GeoSearchControl } from "leaflet-geosearch";
 import L from "leaflet";
 import { center } from "@/utils/location_center";
 import { IoReloadCircle } from "react-icons/io5";
+import Link from "next/link";
 
-const myIcon = new L.icon({
+const vetIcon = new L.icon({
   iconUrl: "/doctor-icon.svg",
-  iconAnchor: null,
-  popupAnchor: null,
   shadowUrl: "/Frame 1.svg",
   shadowSize: new L.point(70, 50),
   shadowAnchor: [35, 8],
@@ -28,7 +27,17 @@ const myIcon = new L.icon({
   iconSize: new L.Point(40, 40),
 });
 
-function DraggableMarker({ location }) {
+const userIcon = new L.icon({
+  iconUrl: "/user_icon.png",
+
+  shadowUrl: "/Frame 1.svg",
+  shadowSize: new L.point(60, 50),
+  shadowAnchor: [30, 0],
+
+  iconSize: new L.Point(70, 70),
+});
+
+function DraggableMarker({ location,icon }) {
   // const [position, setPosition] = useState(center);
 
   const markerRef = useRef(null);
@@ -48,7 +57,7 @@ function DraggableMarker({ location }) {
 
   return (
     <Marker
-      icon={myIcon}
+      icon={icon}
       draggable={true}
       eventHandlers={eventHandlers}
       position={[location[0].lat, location[0].lng]}
@@ -67,7 +76,7 @@ const Search = ({ location }) => {
       showMarker: false, // optional: true|false  - default true
       showPopup: false, // optional: true|false  - default false
       // marker: {
-      //   icon: myIcon,
+      //   icon: vetIcon,
       //   draggable: true,
       // },
 
@@ -105,6 +114,8 @@ const MyMap = ({
   setUserLocation,
   previous = false,
   update = true,
+  icon = 'vet',
+  allVets
 }) => {
   const [automaticLocation, setAutomaticLocation] = useState(
     !previous ? true : false
@@ -186,9 +197,60 @@ const MyMap = ({
       )}
 
       <div className={``}>
+      <MapContainer
+              center={[center.lat, center.lng]}
+              zoom={16}
+              scrollWheelZoom={true}
+              style={{ height: 500, width: "100%" }}
+            >
+              <TileLayer
+                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <ChangeView center={userLocation} />
+
+                {
+                  allVets && allVets.map((vetInfo)=>{ 
+
+                    return <Marker
+                    position={[vetInfo.location.lat, vetInfo.location.lng]}
+                    icon={ vetIcon}
+                  >
+                    <Popup>
+                      <div className="flex flex-col gap-y-1 mb-3 text-lg">
+                      <div className="text-center font-bold">
+                        Vet
+                      </div>
+                      <div className="">
+                      <span className="text-primary font-bold">
+                      Name: {" "}
+                        </span>
+                      {vetInfo.vet.name}
+                      </div>
+                      <div>
+                      <span className="text-primary font-bold">
+                      Email:{" "}
+                        </span>
+                       {vetInfo.vet.email}
+                      </div>
+                      <div>
+                      <span className="text-primary font-bold">
+                      Profile: {" "}
+                        </span> <Link href={`/user/vets/${vetInfo.vetId}`}>View Profile</Link>
+                      </div>
+
+
+
+                       </div>
+                    </Popup>
+                  </Marker>
+})
+                }
+
+
         {automaticLocation ? (
           <>
-            <MapContainer
+            {/* <MapContainer
               center={[center.lat, center.lng]}
               zoom={16}
               scrollWheelZoom={true}
@@ -198,30 +260,23 @@ const MyMap = ({
               <TileLayer
                 attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
+              /> */}
               <Marker
                 position={[userLocation.lat, userLocation.lng]}
-                icon={myIcon}
+                icon={ icon==='vet'?  vetIcon:userIcon}
               >
                 <Popup>
-                  A pretty CSS3 popup. <br /> Easily customizable.
+                  <div className="text-semi-blue text-bold text-xl">
+                  You
+                  </div>
+
                 </Popup>
               </Marker>
-            </MapContainer>
+            {/* </MapContainer> */}
           </>
         ) : (
           <>
-            <MapContainer
-              center={[center.lat, center.lng]}
-              zoom={16}
-              scrollWheelZoom={true}
-              style={{ height: 500, width: "100%" }}
-            >
-              <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <ChangeView center={userLocation} />
+
               {/* <Marker position={[newLocation[1], newLocation[0]]}>
           <Popup>
             A pretty CSS3 popup. <br /> Easily customizable.
@@ -232,7 +287,7 @@ const MyMap = ({
           <DraggableMarker location={[newLocation, setNewLocation]} />
         )} */}
 
-              <DraggableMarker location={[userLocation, setUserLocation]} />
+              <DraggableMarker location={[userLocation, setUserLocation]} icon={ icon==='vet'?  vetIcon:userIcon} />
 
               {/* <Marker position={[23.7461, 90.3742]}>
         <Popup>
@@ -241,9 +296,11 @@ const MyMap = ({
       </Marker>  */}
 
               <Search location={[userLocation, setUserLocation]} />
-            </MapContainer>
+
           </>
         )}
+
+</MapContainer>
       </div>
     </div>
   );

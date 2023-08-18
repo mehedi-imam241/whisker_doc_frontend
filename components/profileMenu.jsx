@@ -5,14 +5,30 @@ import {
   MenuItem,
   Avatar,
   Typography,
+  
 } from "@material-tailwind/react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export function ProfileMenu({ editProfileLink }) {
   const router = useRouter();
-
+  const [logout, setLogout] = useState(false);
+  useEffect(() => {
+    if (logout) {
+      Cookies.remove("user", {
+        path: "/",
+        domain: "localhost",
+      });
+      Cookies.remove("accessToken", {
+        path: "/",
+        domain: "localhost",
+      }); 
+      window.location.href = "/login";
+    }
+  }, [logout]);
+      
   return (
     <Menu>
       <MenuHandler>
@@ -115,18 +131,7 @@ export function ProfileMenu({ editProfileLink }) {
         <hr className="my-2 border-blue-gray-50" />
         <MenuItem
           className="flex items-center gap-2 "
-          onClick={() => {
-            console.log("sign out");
-            Cookies.remove("user", {
-              path: "/",
-              domain: "localhost",
-            }); // removed!
-            Cookies.remove("accessToken", {
-              path: "/",
-              domain: "localhost",
-            }); // removed!
-            router.replace("/login");
-          }}
+          onClick={setLogout}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

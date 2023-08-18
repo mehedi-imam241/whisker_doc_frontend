@@ -78,6 +78,27 @@ const TABLE_ROWS = (params) => [
   },
 ];
 
+
+const getVetInfo = (dataVetInfo) => {
+  if (!dataVetInfo || !dataVetInfo.getMyInfo) {
+    return {
+      degree: "Not Provided",
+      certificateId: "Not Provided",
+      zoomLink: "Not Provided",
+    };
+
+  } else {
+    return {
+      degree: dataVetInfo.getMyInfo.degree,
+      certificateId: dataVetInfo.getMyInfo.certificateId,
+      zoomLink: dataVetInfo.getMyInfo.zoomLink,
+    };
+  }
+};
+
+
+
+
 export default function Page() {
   const USER = JSON.parse(Cookies.get("user"));
 
@@ -119,7 +140,7 @@ export default function Page() {
                 <tbody>
                   {TABLE_ROWS({
                     ...data["getVet"],
-                    ...dataVetInfo["getMyInfo"],
+                    ...(getVetInfo(dataVetInfo)),
                   }).map(({ name, job }, index) => {
                     const isLast = index === TABLE_ROWS.length - 1;
                     const classes = isLast
@@ -178,18 +199,21 @@ export default function Page() {
             My Location
           </h1>
           <div className="mx-[10%]">
-            <Map userLocation={dataVetInfo.getMyInfo.location} update={false} />
+            {
+              dataVetInfo && dataVetInfo.getMyInfo? <Map userLocation={dataVetInfo.getMyInfo.location} update={false} /> : <p className="text-2xl text-red-500 -mt-10" >Not Provided</p>
+            }
+            
           </div>
         </>
       )}
 
       {isSlotCreated.IsSlotCreated.message === "0" ? (
         <Link href={"/vet/slots/create"}>
-          <ButtonCustom className={"my-20"}>Provide Slots</ButtonCustom>
+          <ButtonCustom className={"my-20 text-2xl"}>Provide Slots</ButtonCustom>
         </Link>
       ) : (
         <Link href={"/vet/slots/update"}>
-          <ButtonCustom className={"my-20"}>Update Slots</ButtonCustom>
+          <ButtonCustom className={"my-20 text-2xl" }>Update Slots</ButtonCustom>
         </Link>
       )}
     </div>

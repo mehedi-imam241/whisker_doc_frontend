@@ -7,6 +7,7 @@ import ButtonCustom from "@/components/Button";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+
 const MySwal = withReactContent(Swal);
 const Map = dynamic(
   () => import("@/components/map"), // replace '@components/map' with your component's location
@@ -61,7 +62,7 @@ export default function Page() {
     if (dataVetInfo?.getMyInfo?.location) {
       setUserLocation(dataVetInfo?.getMyInfo?.location);
     }
-    if (dataVetInfo) {
+    if (dataVetInfo && dataVetInfo.getMyInfo) {
       setValue("degree", dataVetInfo.getMyInfo.degree);
       setValue("certificateId", dataVetInfo.getMyInfo.certificateId);
       setValue("zoomLink", dataVetInfo.getMyInfo.zoomLink);
@@ -71,7 +72,6 @@ export default function Page() {
   const onSubmit = async (form_data) => {
     form_data.location = userLocation;
 
-    console.log(form_data);
 
     try {
       const { data } = await UpdateVetInfo({

@@ -107,7 +107,7 @@ export default function CustomNavbar() {
 
   return (
     <Navbar
-      className={`fixed left-1/2 -translate-x-1/2 top-0 py-2 px-4 lg:px-8 lg:py-4 font-roboto text-lg mb-5 bg-white min-w-full  max-w-full z-[1000] ${
+      className={`fixed left-1/2 -translate-x-1/2 top-0 py-2 px-4 lg:px-8 lg:py-4 font-roboto text-lg mb-5 bg-white min-w-full  max-w-full z-[1000000] ${
         scrolled ? " shadow-lg " : "shadow-none"
       } `}
     >

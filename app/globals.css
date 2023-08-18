@@ -33,9 +33,10 @@ html  {
     font-family: var(--font-roboto-condensed);
 }
 
-h1 {
+h1,h2,h3,h4,h5,h6 {
     font-family: var(--font-roboto);
 }
+
 
 body {
     overflow-x: hidden;

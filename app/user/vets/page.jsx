@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { center } from "@/utils/location_center";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useQuery, useLazyQuery } from "@apollo/client";
 import {
   Avatar,
   Button,
@@ -10,21 +10,42 @@ import {
   CardFooter,
   CardHeader,
   Typography,
+  Menu,
+  MenuItem,
+  MenuHandler,
+  MenuList,
 } from "@material-tailwind/react";
 import { Pagination } from "@mui/material";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 
-// const GET_VETS = gql`
-//   query GetVets($limit: Float!, $skip: Float!) {
-//     getVets(limit: $limit, skip: $skip) {
-//       _id
-//       avatar
-//       email
-//       name
-//     }
-//   }
-// `;
+const GET_VETS = gql`
+  query GetAllVetsByLocation(
+    $location: LocationInput!
+    $limit: Float!
+    $skip: Float!
+    $sortBy: SortByInput!
+  ) {
+    getAllVetsByLocation(
+      location: $location
+      limit: $limit
+      skip: $skip
+      sort_by: $sortBy
+    ) {
+      vet {
+        name
+        email
+      }
+      location {
+        lat
+        lng
+      }
+      distance
+      duration
+      vetId
+    }
+  }
+`;
 
 // const PAGE_COUNT = gql`
 //   query Query {
@@ -39,77 +60,151 @@ const Map = dynamic(
 
 function PageUtils(props) {
   const [userLocation, setUserLocation] = useState(center);
-  //   const [mounted, setMounted] = useState(false);
-
-  //   useEffect(() => {
-  //     setMounted(true);
-  //   }, []);
+  const [sortBy, setSortBy] = useState("DURATION");
 
   // const [skip, setSkip] = React.useState(0);
   // const { data: dataPageCount, loading: loadingPageCount } =
   //   useQuery(PAGE_COUNT);
-  // const { data, loading, error } = useQuery(GET_VETS, {
-  //   variables: {
-  //     limit: 10,
-  //     skip: skip,
-  //   },
-  // });
+  const [getAllVetsByLocation, { data, loading, error }] =
+    useLazyQuery(GET_VETS);
 
-  // if (loading || loadingPageCount) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div className="mb-20">
       <h1 className={"text-semi-blue font-semibold text-center"}>
         Choose Nearby Vet
       </h1>
 
-      <Map userLocation={userLocation} setUserLocation={setUserLocation} />
-
-      {/* <div className="grid grid-cols-1 sm:grid-cols-5 gap-6">
-        {dataPageCount &&
-          data &&
-          data.getVets.map((vet, index) => ( 
-            <Card className="w-[290px]" key={index}>
-              <CardHeader
-                shadow={false}
-                floated={false}
-                className="h-64 flex items-center justify-center"
-              >
-                <Avatar
-                  src="/assets/user.png"
-                  alt="avatar"
-                  withBorder={true}
-                  className="p-0.5 w-60  h-60"
-                />
-              </CardHeader>
-              <CardBody>
-                <div className="mb-2 flex items-center justify-between">
-                  <Typography color="blue-gray" className="font-medium">
-                    {vet.name}
-                  </Typography>
-                </div>
-
-                <a href={"mailto:" + vet.email} className="text-blue-gray-500">
-                  {vet.email}
-                </a>
-              </CardBody>
-              <CardFooter className="pt-0">
-                <Link href={"/user/vets/" + vet._id}>
-                  <Button
-                    ripple={false}
-                    fullWidth={true}
-                    color="orange"
-                    className=" shadow-none hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100"
-                  >
-                    See Profile
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
+      <div className="mx-[10%]">
+        <Map
+          userLocation={userLocation}
+          setUserLocation={setUserLocation}
+          icon="user"
+          allVets={data?.getAllVetsByLocation}
+        />
       </div>
 
-      <div className={"my-10"}>
+      <div className="text-center">
+
+
+
+      <Menu >
+        <MenuHandler className="my-20 ">
+          <Button color="indigo" variant="outlined" className="rounded-full " >
+            {sortBy === "DURATION" ? "Sort By Duration" : "Sort By Distance"}
+          </Button>
+        </MenuHandler>
+        <MenuList>
+          <MenuItem
+            onClick={() => {
+              
+              setSortBy("DURATION");
+              
+              return getAllVetsByLocation({
+                variables: {
+                  location: userLocation,
+                  limit: 10,
+                  skip: 0,
+                  sortBy: {
+                    sortBy: "DURATION",
+                  }
+                },
+              })
+            }
+          
+          
+          
+          }
+          >
+            Sort By Duration
+          </MenuItem>
+          <MenuItem
+            onClick={() => 
+            {
+
+              setSortBy("DISTANCE");
+              
+              return getAllVetsByLocation({
+                variables: {
+                  location: userLocation,
+                  limit: 10,
+                  skip: 0,
+                  sortBy: {
+                    sortBy: "DISTANCE",
+                  }
+                },
+              })
+            }}
+          >
+            Sort By Distance
+          </MenuItem>
+        </MenuList>
+      </Menu>
+      </div>
+
+
+      {loading && (
+        <div>Loading...</div>
+      )}
+
+
+      {data && (
+      <div className="grid grid-cols-1 sm:grid-cols-5 gap-6 mt-20">
+        {data.getAllVetsByLocation.map((vetInfo, index) => (
+          <Card className="w-[290px]" key={index}>
+            <CardHeader
+              shadow={false}
+              floated={false}
+              className="h-64 flex items-center justify-center"
+            >
+              <Avatar
+                src="/assets/user.png"
+                alt="avatar"
+                withBorder={true}
+                className="p-0.5 w-60  h-60"
+              />
+            </CardHeader>
+            <CardBody>
+              <div className="mb-2 flex items-center justify-between">
+                <Typography color="blue-gray" className="font-medium">
+                  {vetInfo.vet.name}
+                </Typography>
+              </div>
+
+              <a
+                href={"mailto:" + vetInfo.vet.email}
+                className="text-blue-gray-500"
+              >
+                {vetInfo.vet.email}
+              </a>
+
+              <div className="mt-4 flex items-center justify-between">
+                <Typography color="blue-gray" className="font-medium">
+                  {Math.round(vetInfo.distance / 100) / 10 + " km"}
+                </Typography>
+                <Typography color="blue-gray" className="font-medium">
+                {Math.round(vetInfo.duration / 6) / 10 + " min"}
+                </Typography>
+              </div>
+            </CardBody>
+            <CardFooter className="pt-0">
+              <Link href={"/user/vets/" + vetInfo.vetId}>
+                <Button
+                  ripple={false}
+                  fullWidth={true}
+                  color="orange"
+                  className=" shadow-none hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100"
+                >
+                  See Profile
+                </Button>
+              </Link>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+      )}
+
+      {/* <div className={"my-10"}>
         <Pagination
           count={dataPageCount.getVetsCount}
           color="primary"
