@@ -33,7 +33,7 @@ Font.register({
 const styles = StyleSheet.create({
   PDFViewer: { width: "100%", height: "80vh" },
   Document: { width: "100%", height: "100%", fontFamily: "Roboto" },
-  page: { width: "100%", height: "100%" },
+  page: { width: "100%", height: "100%",paddingTop: "30px", paddingBottom: "30px"},
   section: { textAlign: "center", margin: 30 },
   rowView: {
     fontSize: 14,
@@ -61,6 +61,67 @@ const MyDocument = () => {
         Dosage: "3",
         Duration: "89",
       },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "2",
+        Duration: "3",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "3",
+        Duration: "89",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "2",
+        Duration: "3",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "3",
+        Duration: "89",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "2",
+        Duration: "3",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "3",
+        Duration: "89",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "2",
+        Duration: "3",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "3",
+        Duration: "89",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "2",
+        Duration: "3",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "3",
+        Duration: "89",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "2",
+        Duration: "3",
+      },
+      {
+        "Suggested Medicine": "1",
+        Dosage: "3",
+        Duration: "89",
+      },
+      
     ],
   };
 
@@ -119,6 +180,7 @@ const MyDocument = () => {
             borderRadius: "3px",
             marginBottom: "30",
           }}
+          alt="pet image"
         />
 
         <View style={{ marginBottom: 40 }}>
@@ -219,8 +281,9 @@ const MyDocument = () => {
 
         <Fragment>
           <View style={styles.rowView}>
-            {tableData["column"].map((c) => (
+            {tableData["column"].map((c,index) => (
               <Text
+              key={index}
                 style={{
                   width: `${100 / tableData["column"].length}%`,
                   backgroundColor: "#2f327d",
@@ -239,6 +302,7 @@ const MyDocument = () => {
               <View style={styles.rowView}>
                 {tableData["column"].map((c) => (
                   <Text
+                  key={index}
                     style={{
                       width: `${100 / tableData["column"].length}%`,
                       backgroundColor: index % 2 == 0 ? "white" : "#f2f2f2",
@@ -253,6 +317,19 @@ const MyDocument = () => {
             </>
           ))}
         </Fragment>
+
+
+        <View style={styles.section}>
+          <Text style={{ color: "orange", fontWeight: "bold", marginTop: "20px" }}>
+            Advice
+          </Text>
+
+
+          <Text style={{ marginTop: "20px", fontSize: "14px", textAlign: "left" }}>
+            hello world 1334
+          </Text>
+          
+        </View>
       </Page>
     </Document>
   );
