@@ -68,7 +68,7 @@ const TABLE_ROWS = (params) => [
 
 function Page({ params }) {
   const curr = new Date();
-  curr.setDate(curr.getDate() + 1);
+  curr.setDate(curr.getDate());
   const today = curr.toISOString().substring(0, 10);
 
   const [date, setDate] = useState(today);

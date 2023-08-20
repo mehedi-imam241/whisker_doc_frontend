@@ -1,25 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { MdDelete } from "react-icons/md";
 import { IconButton, input } from "@material-tailwind/react";
-import { Input } from "@mui/material";
+import { Input, Autocomplete, TextField } from "@mui/material";
 import { AiFillPlusCircle } from "react-icons/ai";
 import ButtonCustom from "@/components/Button";
-import { TextField } from "@mui/material";
+import { useLazyQuery, gql } from "@apollo/client";
 
+const top100Films = [
+  "The Shawshank Redemption",
+  "The Godfather",
+  "The Godfather: Part II",
+];
 
-const styles = {
-  root: {
-    background: "black"
-  },
-  input: {
-    color: "#2EFF22"
+const GET_DRUGS = gql`
+  query SearchDrug($query: String!) {
+    searchDrug(query: $query) {
+      Drug
+    }
   }
-};
+`;
 
-export default function Page() {
+export default function VetPrescription({ appointment }) {
+  const [medicines, setMedicines] = useState([]);
+
+  const [searchDrug, { loading, error, data }] = useLazyQuery(GET_DRUGS);
+
   const { register, control, handleSubmit, reset, trigger, setError } = useForm(
     {
       // defaultValues: {}; you can populate the fields by this attribute
@@ -49,42 +57,44 @@ export default function Page() {
     remove: removeMedicines,
   } = useFieldArray({
     control,
-    name: "medicines"
-  })
-
-  const today = new Date().toDateString();
+    name: "medicines",
+  });
 
   return (
-    <form
-      className="mx-[5%] "
-      onSubmit={handleSubmit((data) => console.log(data))}
-    >
-      <h1 className="text-3xl text-semi-blue text-center my-20">
+    <form className="" onSubmit={handleSubmit((data) => console.log(data))}>
+      <h1 className="text-3xl text-semi-blue text-center my-20 ">
         Prescription
       </h1>
       <h2 className="text-2xl text-semi-blue mb-14 ">Information</h2>
       <h3 className="text-xl  mb-4">
-        <span className="text-primary font-semibold">Date :</span> {today}
+        <span className="text-primary font-semibold">Date :</span>{" "}
+        {appointment.date.substring(0, 10)}
       </h3>
 
       <div className="grid grid-cols-3 place-content-center">
         <h3 className="text-xl  mb-4">
-          <span className="text-primary font-semibold">Name :</span> Nemo
+          <span className="text-primary font-semibold">Name :</span>{" "}
+          {appointment.pet.name}
         </h3>
         <h3 className="text-xl  mb-4">
-          <span className="text-primary font-semibold">Species :</span> Cat
+          <span className="text-primary font-semibold">Species :</span>{" "}
+          {appointment.pet.species}
         </h3>
         <h3 className="text-xl  mb-4">
-          <span className="text-primary font-semibold">Breed :</span> Local
+          <span className="text-primary font-semibold">Breed :</span>{" "}
+          {appointment.pet.breed}
         </h3>
         <h3 className="text-xl  mb-4">
-          <span className="text-primary font-semibold">Gender :</span> Female
+          <span className="text-primary font-semibold">Gender :</span>{" "}
+          {appointment.pet.gender}
         </h3>
         <h3 className="text-xl  mb-4">
-          <span className="text-primary font-semibold">Age :</span> 2 years
+          <span className="text-primary font-semibold">Age :</span>{" "}
+          {appointment.pet.age} years
         </h3>
         <h3 className="text-xl  mb-4">
-          <span className="text-primary font-semibold">Weight :</span> 4 kg
+          <span className="text-primary font-semibold">Weight :</span>{" "}
+          {appointment.pet.weight} kg
         </h3>
       </div>
 
@@ -100,7 +110,7 @@ export default function Page() {
               size="sm"
               className="rounded-full"
               type="button"
-              onClick={() => appendSymptoms("bill")}
+              onClick={() => appendSymptoms("Symptom")}
               color="orange"
             >
               <AiFillPlusCircle size={25} />
@@ -113,7 +123,11 @@ export default function Page() {
                 key={item.id}
                 className="mb-4 flex justify-between items-center gap-4 "
               >
-                <Input variant="standard" {...register(`symptoms.${index}`)} className="w-[300px]" />
+                <Input
+                  variant="standard"
+                  {...register(`symptoms.${index}`)}
+                  className="w-[300px]"
+                />
 
                 {/* <Controller
                   render={({ field }) => <input {...field} />}
@@ -143,7 +157,7 @@ export default function Page() {
               size="sm"
               className="rounded-full"
               type="button"
-              onClick={() => appendDiseases("bill")}
+              onClick={() => appendDiseases("Disease")}
               color="orange"
             >
               <AiFillPlusCircle size={25} />
@@ -158,7 +172,11 @@ export default function Page() {
               >
                 {/* <input {...register(`diseases.${index}`)} /> */}
 
-                <Input variant="standard" {...register(`diseases.${index}`)} className="w-[300px]"/>
+                <Input
+                  variant="standard"
+                  {...register(`diseases.${index}`)}
+                  className="w-[300px]"
+                />
                 {/* <Controller
                   render={({ field }) => <input {...field} />}
                   name={`test.${index}.lastName`}
@@ -197,25 +215,60 @@ export default function Page() {
             <span className="text-primary font-semibold">Duration (days)</span>
           </h3>
           <IconButton
-          variant="gradient"
-          size="sm"
-          className="rounded-full"
-          type="button"
-          onClick={() => appendMedicines({
-            name: "Medicine",
-            dose: "1+1+1",
-            duration: "7",
-          })}
-          color="orange"
-        >
-          <AiFillPlusCircle size={25} />
-        </IconButton>
+            variant="gradient"
+            size="sm"
+            className="rounded-full"
+            type="button"
+            onClick={() =>
+              appendMedicines({
+                name: "Medicine",
+                dose: "1+1+1",
+                duration: "7",
+              })
+            }
+            color="orange"
+          >
+            <AiFillPlusCircle size={25} />
+          </IconButton>
 
           {fieldsMedicines.map((item, index) => (
             <>
-              <Input variant="standard" {...register(`medicines.${index}.name`)} className="w-[300px]"/>
-              <Input variant="standard" {...register(`medicines.${index}.dose`)} className="w-[300px]"/>
-              <Input variant="standard" {...register(`medicines.${index}.duration`)} className="w-[300px]"/>
+              <Autocomplete
+                disablePortal
+                id="combo-box-demo"
+                options={medicines}
+                sx={{ width: 300 }}
+                renderInput={(params) => (
+                  <TextField
+                    variant="standard"
+                    {...params}
+                    {...register(`medicines.${index}.name`, {
+                      onChange: async (e) => {
+                        const { data } = await searchDrug({
+                          variables: { query: e.target.value },
+                        });
+                        const fetchedMedicines = [];
+                        data.searchDrug.map((drug) => {
+                          fetchedMedicines.push(drug.Drug);
+                        });
+                        setMedicines(fetchedMedicines);
+                      },
+                    })}
+                    className="w-[300px]"
+                  />
+                )}
+              />
+
+              <Input
+                variant="standard"
+                {...register(`medicines.${index}.dose`)}
+                className="w-[300px]"
+              />
+              <Input
+                variant="standard"
+                {...register(`medicines.${index}.duration`)}
+                className="w-[300px]"
+              />
 
               <IconButton
                 variant="gradient"
@@ -228,43 +281,27 @@ export default function Page() {
               </IconButton>
             </>
           ))}
-
-
-
         </div>
-
-
-
-
-
-
-
-
-
-
-
-
       </div>
 
       <div className="w-1/2 my-10 ">
-
-
-
-      <TextField id="standard-basic" label="Advice" variant="standard"  fullWidth color="warning" inputProps={{
-  style: {fontSize: 20} 
-  
-}}
-
-{...register("advice")}
-
-/>
+        <TextField
+          id="standard-basic"
+          label="Advice"
+          variant="standard"
+          fullWidth
+          color="warning"
+          inputProps={{
+            style: { fontSize: 20 },
+          }}
+          {...register("advice")}
+        />
       </div>
 
-
-
-
       <div className="text-center my-20">
-        <ButtonCustom className={"text-xl"} type="submit">Submit</ButtonCustom>
+        <ButtonCustom className={"text-xl"} type="submit">
+          Submit
+        </ButtonCustom>
       </div>
     </form>
   );

@@ -14,9 +14,9 @@ import { usePathname } from "next/navigation";
 import { ProfileMenu } from "@/components/profileMenu";
 
 const navLinks = [
-  { title: "Symptoms", link: "/user/symptoms" },
-  { title: "Home Service", link: "/user/home-service" },
-  { title: "Review", link: "/user/review" },
+  { title: "Symptoms", link: "/vet/symptoms" },
+  { title: "Appointments", link: "/vet/appointments" },
+  { title: "Review", link: "/vet/review" },
   { title: "Blogs", link: "/vet/blogs" },
 ];
 
