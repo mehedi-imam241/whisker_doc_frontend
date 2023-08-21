@@ -69,6 +69,9 @@ function Page(props) {
       });
       reset();
     } catch (e) {
+
+
+
       await MySwal.fire({
         title: "Error!",
         text: "Something went wrong or user already exists",

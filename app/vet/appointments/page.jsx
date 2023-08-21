@@ -12,6 +12,8 @@ import slots from "@/utils/slots";
 import { FaCat, FaClock } from "react-icons/fa";
 import { MdOutlineMan } from "react-icons/md";
 import Link from "next/link";
+import isInRange from "@/utils/in_range";
+import { MdTimelapse } from "react-icons/md";
 
 const GetAppointments = gql`
   query GetAllAppointmentsOfVetToday($type: String!) {
@@ -31,14 +33,26 @@ const GetAppointments = gql`
 `;
 
 const CardAppointment = ({ appointment }) => (
-  <Card className="mt-6 w-96">
+  <Card className="mt-6 w-96" >
     <CardBody>
+
+      <div className="flex justify-between">
+
+
       <div className="flex ">
         <FaClock size={25} className="mr-2 text-primary" />
         <Typography variant="h5" color="blue-gray" className="mb-2">
           {slots[appointment.slot_id].starts_at} -{" "}
           {slots[appointment.slot_id].ends_at}
         </Typography>
+      </div>
+
+      <div>
+        {
+          isInRange([slots[appointment.slot_id].starts_at,slots[appointment.slot_id].ends_at]) && <MdTimelapse size={30} color="red"/>
+        }
+      </div>
+
       </div>
 
       <div className="flex justify-between mt-5 mb-3">
@@ -85,6 +99,7 @@ export default function Page() {
 
   if (onlineLoading || offlineLoading) return <p>Loading...</p>;
 
+
   return (
     <div className="mx-[5%]">
       <h1 className="text-semibold text-3xl text-semi-blue text-center mt-32 font-semibold">
@@ -92,11 +107,11 @@ export default function Page() {
       </h1>
 
       <h2 className="text-2xl text-semi-blue my-10 font-semibold">
-        Upcoming{" "}
+        {" "}
         <span className="text-2xl text-primary my-10 font-semibold">
-          online
+          Online
         </span>{" "}
-        appointments
+        appointments today
       </h2>
 
       <div className="grid grid-flow-col auto-cols-max gap-x-4 mb-20">
@@ -110,11 +125,11 @@ export default function Page() {
       </div>
 
       <h2 className="text-2xl text-semi-blue my-10 font-semibold">
-        Upcoming{" "}
+        {" "}
         <span className="text-2xl text-primary my-10 font-semibold">
-          offline
+          Offline
         </span>{" "}
-        appointments
+        appointments today
       </h2>
 
       <div className="grid grid-flow-col auto-cols-max gap-x-4 mb-20">

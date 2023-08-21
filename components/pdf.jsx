@@ -47,119 +47,49 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const MyDocument = () => {
+const MyDocument = ({prescription,appointment}) => {
+
+
   const tableData = {
-    column: ["Suggested Medicine", "Dosage", "Duration"],
-    data: [
-      {
-        "Suggested Medicine": "1",
-        Dosage: "2",
-        Duration: "3",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "3",
-        Duration: "89",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "2",
-        Duration: "3",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "3",
-        Duration: "89",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "2",
-        Duration: "3",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "3",
-        Duration: "89",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "2",
-        Duration: "3",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "3",
-        Duration: "89",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "2",
-        Duration: "3",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "3",
-        Duration: "89",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "2",
-        Duration: "3",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "3",
-        Duration: "89",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "2",
-        Duration: "3",
-      },
-      {
-        "Suggested Medicine": "1",
-        Dosage: "3",
-        Duration: "89",
-      },
-      
-    ],
+    column: ["name", "dose", "duration"],
   };
 
   const petData = [
     {
       Name: "Pet Name",
-      Data: "Nemo",
+      Data: appointment.pet.name,
     },
     {
       Name: "Consultant",
-      Data: "Dr. John Doe",
+      Data: appointment.vet.name,
     },
     {
       Name: "Prescription ID",
-      Data: "1",
+      Data: prescription._id,
     },
     {
       Name: "Date",
-      Data: "2-10-23",
+      Data: appointment.date.substring(0,10),
     },
 
     {
       Name: "Species",
-      Data: "Dog",
+      Data: appointment.pet.species,
     },
     {
       Name: "Breed",
-      Data: "Poodle",
+      Data: appointment.pet.breed,
     },
     {
       Name: "Pet Age",
-      Data: "2",
+      Data: appointment.pet.age,
     },
     {
       Name: "Pet Weight",
-      Data: "3 kg",
+      Data: appointment.pet.weight + " kg",
     },
   ];
+
 
   return (
     <Document style={styles.Document}>
@@ -233,7 +163,7 @@ const MyDocument = () => {
             color: "#444444",
             fontSize: 12,
             gap: 30,
-            marginBottom: 40,
+            marginBottom: 10,
             fontWeight: "bold",
           }}
         >
@@ -249,14 +179,18 @@ const MyDocument = () => {
               Symptoms
             </Text>
             <View style={{ display: "flex", flexDirection: "column" }}>
-              <View style={{ flexDirection: "row", marginBottom: 4 }}>
-                <Text style={{ marginHorizontal: 8 }}>•</Text>
-                <Text>Fever</Text>
-              </View>
-              <View style={{ flexDirection: "row", marginBottom: 4 }}>
-                <Text style={{ marginHorizontal: 8 }}>•</Text>
-                <Text>Runny Nose</Text>
-              </View>
+
+              {
+                prescription.symptoms.map((symptom)=> {
+                  return <View style={{ flexDirection: "row", marginBottom: 4 }}>
+                  <Text style={{ marginHorizontal: 8 }}>•</Text>
+                  <Text>{symptom}</Text>
+                </View>
+                })
+              }
+
+
+
             </View>
           </View>
           <View>
@@ -271,15 +205,32 @@ const MyDocument = () => {
               Diseases
             </Text>
             <View style={{ display: "flex", flexDirection: "column" }}>
-              <View style={{ flexDirection: "row", marginBottom: 4 }}>
-                <Text style={{ marginHorizontal: 8 }}>•</Text>
-                <Text>Flu</Text>
-              </View>
+            {
+                prescription.diseases.map((disease)=> {
+                  return <View style={{ flexDirection: "row", marginBottom: 4 }}>
+                  <Text style={{ marginHorizontal: 8 }}>•</Text>
+                  <Text>{disease}</Text>
+                </View>
+                })
+              }
             </View>
           </View>
         </View>
 
+
+
+        <View style={styles.section}>
+          <Text style={{ color: "orange", fontWeight: "bold" }}>
+            Medicines
+          </Text>
+
+          
+        </View>
+
         <Fragment>
+
+
+
           <View style={styles.rowView}>
             {tableData["column"].map((c,index) => (
               <Text
@@ -297,7 +248,7 @@ const MyDocument = () => {
               </Text>
             ))}
           </View>
-          {tableData["data"].map((rowData, index) => (
+          {prescription.medicines.map((rowData, index) => (
             <>
               <View style={styles.rowView}>
                 {tableData["column"].map((c) => (
@@ -326,7 +277,7 @@ const MyDocument = () => {
 
 
           <Text style={{ marginTop: "20px", fontSize: "14px", textAlign: "left" }}>
-            hello world 1334
+            {prescription.advice}
           </Text>
           
         </View>
@@ -335,10 +286,10 @@ const MyDocument = () => {
   );
 };
 
-export default function MyPDF() {
+export default function MyPDF({prescription,appointment}) {
   return (
     <PDFViewer style={styles.PDFViewer}>
-      <MyDocument />
+      <MyDocument prescription={prescription} appointment={appointment} />
     </PDFViewer>
   );
 }

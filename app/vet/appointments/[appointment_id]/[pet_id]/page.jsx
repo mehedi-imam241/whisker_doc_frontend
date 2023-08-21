@@ -13,14 +13,26 @@ import Link from "next/link";
 import { FaUserDoctor } from "react-icons/fa6";
 import { SlCalender } from "react-icons/sl";
 import VetPrescription from "@/components/VetPrescription";
+import { MdTimelapse } from "react-icons/md";
+import isInRange, { isInRangeByDate } from "@/utils/in_range";
+
+
+import  dynamic from 'next/dynamic'
+const PDFViewer = dynamic(()=>import('@/components/pdf'),{ssr:false})
 
 const FETCH_APPOINMENT = gql`
   query GetAppointmentById($appointmentId: String!) {
     getAppointmentById(appointmentId: $appointmentId) {
+      _id,
       owner {
         email
         name
       }
+
+      vet {
+        name
+      }
+
       pet {
         age
         avatar
@@ -33,6 +45,17 @@ const FETCH_APPOINMENT = gql`
       slot_id
       type
       date
+      prescription {
+        _id
+        advice
+        diseases
+        medicines {
+          dose
+          duration
+          name
+        }
+        symptoms
+      }
     }
   }
 `;
@@ -137,6 +160,8 @@ export default function Page({ params }) {
     },
   });
 
+
+
   const {
     loading: loadingPrevious,
     error: errorPrevious,
@@ -154,7 +179,22 @@ export default function Page({ params }) {
       <h1 className="text-semibold text-3xl text-semi-blue text-center mt-32 font-semibold">
         Appointment Details
       </h1>
-      <Card className="w-[800px] h-full overflow-auto mx-auto mt-10">
+
+
+      {
+           isInRangeByDate([slots[data.getAppointmentById.slot_id].starts_at,slots[data.getAppointmentById.slot_id].ends_at],data.getAppointmentById.date) &&   <div className="flex justify-between text-red-500 my-10 w-[800px] mx-auto">
+              <h2 className="font-semibold">
+                Meeting currently running
+              </h2>
+              <MdTimelapse size={30} />
+            </div>
+      }
+
+
+      <Card className="w-[820px] h-full overflow-auto mx-auto mt-10">
+
+
+
         <table className="w-full min-w-max table-auto text-left">
           <tbody>
             {data &&
@@ -209,7 +249,14 @@ export default function Page({ params }) {
         )}
       </div>
 
-      {data && <VetPrescription appointment={data.getAppointmentById} />}
+      {data && isInRangeByDate([slots[data.getAppointmentById.slot_id].starts_at,slots[data.getAppointmentById.slot_id].ends_at],data.getAppointmentById.date) && <VetPrescription appointment={data.getAppointmentById} petId={params.pet_id}/>}
+
+      {/* {data &&   <VetPrescription appointment={data.getAppointmentById} petId={params.pet_id} />} */}
+
+      {
+        data.getAppointmentById.prescription && <PDFViewer prescription={data.getAppointmentById.prescription} appointment = {data.getAppointmentById}/>
+      }
+
     </div>
   );
 }

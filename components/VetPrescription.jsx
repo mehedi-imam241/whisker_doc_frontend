@@ -7,13 +7,22 @@ import { IconButton, input } from "@material-tailwind/react";
 import { Input, Autocomplete, TextField } from "@mui/material";
 import { AiFillPlusCircle } from "react-icons/ai";
 import ButtonCustom from "@/components/Button";
-import { useLazyQuery, gql } from "@apollo/client";
+import { useLazyQuery, gql, useMutation } from "@apollo/client";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
-const top100Films = [
-  "The Shawshank Redemption",
-  "The Godfather",
-  "The Godfather: Part II",
-];
+const MySwal = withReactContent(Swal);
+
+
+const CREATE_PRESCRIPTION = gql`
+mutation Mutation($input: CreatePrescription!) {
+  createPrescription(input: $input) {
+    message
+    success
+  }
+}
+`
+
 
 const GET_DRUGS = gql`
   query SearchDrug($query: String!) {
@@ -23,10 +32,11 @@ const GET_DRUGS = gql`
   }
 `;
 
-export default function VetPrescription({ appointment }) {
+export default function VetPrescription({ appointment,petId }) {
   const [medicines, setMedicines] = useState([]);
 
   const [searchDrug, { loading, error, data }] = useLazyQuery(GET_DRUGS);
+  const [createPrescription,{loading:loadingPrescription,error:errorPrescription,data:dataPrescription}] = useMutation(CREATE_PRESCRIPTION)
 
   const { register, control, handleSubmit, reset, trigger, setError } = useForm(
     {
@@ -60,8 +70,52 @@ export default function VetPrescription({ appointment }) {
     name: "medicines",
   });
 
+
+  const onSubmit=async (form_data) => {
+
+    try {
+
+      form_data.medicines.forEach(element => {
+        element.duration = parseInt(element.duration)
+      });
+
+
+      const {data} = await createPrescription({
+        variables: {
+          "input": {
+            "appointmentId": appointment._id,
+            "petId": petId,
+              ...form_data
+          }
+        }
+      })
+
+      console.log('here data',data);
+      if(data.createPrescription.success===false)
+      throw new Error('');
+
+      await MySwal.fire({
+        title: "Success!",
+        text: data.createPrescription.message,
+        icon: "success",
+        confirmButtonText: "Ok",
+      });
+
+    } catch (error) {
+
+
+
+      await MySwal.fire({
+        title: "Error!",
+        text: "Something went wrong",
+        icon: "error",
+        confirmButtonText: "Ok",
+      });
+    }
+  }
+
   return (
-    <form className="" onSubmit={handleSubmit((data) => console.log(data))}>
+    <form className="" onSubmit={handleSubmit(onSubmit)}>
       <h1 className="text-3xl text-semi-blue text-center my-20 ">
         Prescription
       </h1>

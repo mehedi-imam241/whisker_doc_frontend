@@ -1,7 +1,7 @@
 'use client'
-
-import  dynamic from 'next/dynamic'
 import React,{useEffect,useState} from 'react';
+import  dynamic from 'next/dynamic'
+
 
 const PDFViewer = dynamic(()=>import('@/components/pdf'),{ssr:false})
 

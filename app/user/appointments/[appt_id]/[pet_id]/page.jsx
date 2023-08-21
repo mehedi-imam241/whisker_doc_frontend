@@ -4,6 +4,9 @@ import { gql, useQuery } from "@apollo/client";
 import { Avatar, Card, Typography } from "@material-tailwind/react";
 import slots from "@/utils/slots";
 import Link from "next/link";
+import  dynamic from 'next/dynamic'
+
+const PDFViewer = dynamic(()=>import('@/components/pdf'),{ssr:false})
 
 const FETCH_APPOINTMENT = gql`
   query GetAppointmentDetails($apptId: String!) {
@@ -11,6 +14,10 @@ const FETCH_APPOINTMENT = gql`
       date
       pet {
         name
+        breed
+        age
+        weight
+        species
       }
       slot_id
       type
@@ -20,6 +27,17 @@ const FETCH_APPOINTMENT = gql`
         _id
       }
       zoomLink
+      prescription {
+        _id
+        advice
+        diseases
+        medicines {
+          dose
+          duration
+          name
+        }
+        symptoms
+      }
     }
   }
 `;
@@ -64,8 +82,12 @@ function Page({ params }) {
     },
   });
   if (loading) return <p>Loading...</p>;
+
+
+  console.log(data.getAppointmentDetails);
+
   return (
-    <div>
+    <div className="mx-[5%]">
       {" "}
       {data && (
         <>
@@ -125,12 +147,34 @@ function Page({ params }) {
             </Card>
           </div>
 
-          <div className={"text-center mt-10"}>
-            <Link href={"/user/vets/" + data.getAppointmentDetails.vet._id}>
-              View Vet Profile
+          <div className={"text-center mt-16 text-xl"}>
+            <Link href={"/user/vets/" + data.getAppointmentDetails.vet._id} className="text-semi-blue hover:text-primary">
+              View Vet Profile 
+              {
+                data.getAppointmentDetails.type==='INPERSON' &&             <> / See Vet Location</>
+              }
             </Link>
           </div>
+
+<div className="mt-16">
+
+
+
+{
+  data.getAppointmentDetails.prescription && <PDFViewer prescription={data.getAppointmentDetails.prescription} appointment={data.getAppointmentDetails}/>
+}
+
+
+</div>
+
+
+          
         </>
+
+          
+
+        
+
       )}
     </div>
   );
