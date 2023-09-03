@@ -41,7 +41,12 @@ function PetSection(props) {
           {data &&
             data.getAllPets.map((pet, index) => (
               <Card className="mt-6 w-96 mx-auto" key={index}>
-                <CardHeader color="white" className="relative h-56 ">
+                <CardHeader
+                  color="white"
+                  className="relative h-56 "
+                  shadow={false}
+                  floated={false}
+                >
                   <img
                     src="/assets/pet.svg"
                     alt="card-image"

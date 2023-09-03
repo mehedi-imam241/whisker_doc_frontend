@@ -1,12 +1,17 @@
 "use client";
 import React from "react";
-import { gql, useQuery } from "@apollo/client";
-import { Avatar, Card, Typography } from "@material-tailwind/react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { Avatar, Button, Card, Typography } from "@material-tailwind/react";
 import slots from "@/utils/slots";
 import Link from "next/link";
-import  dynamic from 'next/dynamic'
+import { TextField } from "@mui/material";
+import dynamic from "next/dynamic";
+import StarRatings from "react-star-ratings";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 
-const PDFViewer = dynamic(()=>import('@/components/pdf'),{ssr:false})
+const MySwal = withReactContent(Swal);
+const PDFViewer = dynamic(() => import("@/components/pdf"), { ssr: false });
 
 const FETCH_APPOINTMENT = gql`
   query GetAppointmentDetails($apptId: String!) {
@@ -75,20 +80,80 @@ const TABLE_ROWS = (params) => [
   },
 ];
 
+const CREATE_REVIEW = gql`
+  mutation CreateReview($review: CreateReviewInput!) {
+    createReview(review: $review) {
+      message
+      success
+    }
+  }
+`;
+
+const FIND_REVIEW = gql`
+  query FindReviewByAppointmentId($apptId: String!) {
+    findReviewByAppointmentId(apptId: $apptId) {
+      comment
+      rating
+    }
+  }
+`;
+
 function Page({ params }) {
   const { loading, error, data } = useQuery(FETCH_APPOINTMENT, {
     variables: {
       apptId: params.appt_id,
     },
   });
-  if (loading) return <p>Loading...</p>;
 
+  const [createReview] = useMutation(CREATE_REVIEW);
 
-  console.log(data.getAppointmentDetails);
+  const { data: reviewData, loading: reviewLoading } = useQuery(FIND_REVIEW, {
+    variables: {
+      apptId: params.appt_id,
+    },
+  });
+
+  const [rating, setRating] = React.useState(5);
+  const [comment, setComment] = React.useState("");
+  if (loading || reviewLoading) return <p>Loading...</p>;
+
+  const handleSubmitReview = async () => {
+    try {
+      const { data: reviewData, error: errorReview } = await createReview({
+        variables: {
+          review: {
+            appointmentId: params.appt_id,
+            rating: rating,
+            comment: comment,
+            vetId: data.getAppointmentDetails.vet._id,
+          },
+        },
+      });
+
+      if (reviewData.success) {
+        await MySwal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Review submitted successfully",
+        });
+      } else {
+        await MySwal.fire({
+          icon: "error",
+          title: "Error",
+          text: "Review could not be submitted",
+        });
+      }
+    } catch (e) {
+      await MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Review could not be submitted",
+      });
+    }
+  };
 
   return (
     <div className="mx-[5%]">
-      {" "}
       {data && (
         <>
           <h2
@@ -140,7 +205,7 @@ function Page({ params }) {
                           </td>
                         </tr>
                       );
-                    },
+                    }
                   )}
                 </tbody>
               </table>
@@ -148,33 +213,94 @@ function Page({ params }) {
           </div>
 
           <div className={"text-center mt-16 text-xl"}>
-            <Link href={"/user/vets/" + data.getAppointmentDetails.vet._id} className="text-semi-blue hover:text-primary">
-              View Vet Profile 
-              {
-                data.getAppointmentDetails.type==='INPERSON' &&             <> / See Vet Location</>
-              }
+            <Link
+              href={"/user/vets/" + data.getAppointmentDetails.vet._id}
+              className="text-semi-blue hover:text-primary"
+            >
+              View Vet Profile
+              {data.getAppointmentDetails.type === "INPERSON" && (
+                <> / See Vet Location</>
+              )}
             </Link>
           </div>
 
-<div className="mt-16">
+          <div className="mt-16">
+            {data.getAppointmentDetails.prescription && (
+              <PDFViewer
+                prescription={data.getAppointmentDetails.prescription}
+                appointment={data.getAppointmentDetails}
+              />
+            )}
+          </div>
 
+          {reviewData ? (
+            <div className="my-16">
+              <h2 className="text-center text-2xl text-semi-blue font-bold">
+                Your Rating
+              </h2>
+              <div className="pt-4 h-[150px] px-5 shadow-lg rounded-lg">
+                <div className="my-5 ">
+                  <StarRatings
+                    rating={reviewData.findReviewByAppointmentId.rating}
+                    numberOfStars={5}
+                    name="rating"
+                    starDimension="23px"
+                    starSpacing="1px"
+                    starRatedColor="#FF8A00"
+                  />
+                </div>
 
+                <div className="mt-5 mb-10 text-lg font-roboto ">
+                  {reviewData.findReviewByAppointmentId.comment}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="my-16">
+              <h2 className="text-center text-2xl text-semi-blue font-bold">
+                Rate your vet
+              </h2>
 
-{
-  data.getAppointmentDetails.prescription && <PDFViewer prescription={data.getAppointmentDetails.prescription} appointment={data.getAppointmentDetails}/>
-}
+              <div className="my-5">
+                <StarRatings
+                  rating={rating}
+                  changeRating={setRating}
+                  numberOfStars={5}
+                  name="rating"
+                  starDimension="23px"
+                  starSpacing="1px"
+                  starRatedColor="#FF8A00"
+                />
+              </div>
 
+              <TextField
+                id="standard-basic"
+                label="Comment"
+                variant="standard"
+                fullWidth
+                color="warning"
+                inputProps={{
+                  style: { fontSize: 20 },
+                }}
+                multiline
+                rows={2}
+                // {...register("advice")}
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+              />
 
-</div>
-
-
-          
+              <div className="mt-10 text-center">
+                <Button
+                  color="indigo"
+                  className="rounded-full text-lg"
+                  onClick={handleSubmitReview}
+                >
+                  Submit
+                </Button>
+              </div>
+            </div>
+          )}
         </>
-
-          
-
-        
-
       )}
     </div>
   );

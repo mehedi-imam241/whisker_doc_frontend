@@ -37,7 +37,7 @@ const userIcon = new L.icon({
   iconSize: new L.Point(70, 70),
 });
 
-function DraggableMarker({ location,icon }) {
+function DraggableMarker({ location, icon }) {
   // const [position, setPosition] = useState(center);
 
   const markerRef = useRef(null);
@@ -75,10 +75,6 @@ const Search = ({ location }) => {
       provider: new OpenStreetMapProvider(),
       showMarker: false, // optional: true|false  - default true
       showPopup: false, // optional: true|false  - default false
-      // marker: {
-      //   icon: vetIcon,
-      //   draggable: true,
-      // },
 
       style: "button",
       autoClose: true,
@@ -100,8 +96,6 @@ const Search = ({ location }) => {
 function ChangeView({ center }) {
   const map = useMap();
 
-  // map.setView([center.lat, center.lng], 16);
-
   useEffect(() => {
     map.panTo([center.lat, center.lng]);
   }, [center]);
@@ -114,8 +108,10 @@ const MyMap = ({
   setUserLocation,
   previous = false,
   update = true,
-  icon = 'vet',
-  allVets
+  icon = "vet",
+  allVets,
+  query,
+  sortBy,
 }) => {
   const [automaticLocation, setAutomaticLocation] = useState(
     !previous ? true : false
@@ -157,6 +153,25 @@ const MyMap = ({
     }
   }, [automaticLocation]);
 
+  useEffect(() => {
+    var container = L.DomUtil.get("map");
+    if (container != null) {
+      container._leaflet_id = null;
+    }
+
+    // var container = L.DomUtil.get("map");
+    // if (container && container["_leaflet_id"] != null) {
+    //   container.remove();
+    // }
+
+    return () => {
+      var container = L.DomUtil.get("map");
+      if (container != null) {
+        container._leaflet_id = null;
+      }
+    };
+  }, []);
+
   // console.log(userLocation);
 
   return (
@@ -197,111 +212,94 @@ const MyMap = ({
       )}
 
       <div className={``}>
-      <MapContainer
-              center={[center.lat, center.lng]}
-              zoom={16}
-              scrollWheelZoom={true}
-              style={{ height: 500, width: "100%" }}
-            >
-              <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              <ChangeView center={userLocation} />
+        <MapContainer
+          center={[center.lat, center.lng]}
+          zoom={16}
+          scrollWheelZoom={true}
+          style={{ height: 500, width: "100%" }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <ChangeView center={userLocation} />
 
-                {
-                  allVets && allVets.map((vetInfo)=>{ 
-
-                    return <Marker
-                    position={[vetInfo.location.lat, vetInfo.location.lng]}
-                    icon={ vetIcon}
-                  >
-                    <Popup>
-                      <div className="flex flex-col gap-y-1 mb-3 text-lg">
-                      <div className="text-center font-bold">
-                        Vet
-                      </div>
+          {allVets &&
+            allVets.map((vetInfo) => {
+              return (
+                <Marker
+                  position={[vetInfo.location.lat, vetInfo.location.lng]}
+                  icon={vetIcon}
+                >
+                  <Popup>
+                    <div className="flex flex-col gap-y-1 mb-3 text-lg">
+                      <div className="text-center font-bold">Vet</div>
                       <div className="">
-                      <span className="text-primary font-bold">
-                      Name: {" "}
-                        </span>
-                      {vetInfo.vet.name}
+                        <span className="text-primary font-bold">Name: </span>
+                        {vetInfo.vet.name}
                       </div>
                       <div>
-                      <span className="text-primary font-bold">
-                      Email:{" "}
-                        </span>
-                       {vetInfo.vet.email}
+                        <span className="text-primary font-bold">Email: </span>
+                        {vetInfo.vet.email}
                       </div>
                       <div>
-                      <span className="text-primary font-bold">
-                      Profile: {" "}
-                        </span> <Link href={`/user/vets/${vetInfo.vetId}`}>View Profile</Link>
+                        <span className="text-primary font-bold">
+                          Profile:{" "}
+                        </span>{" "}
+                        <Link href={`/user/vets/${vetInfo.vetId}`}>
+                          View Profile
+                        </Link>
                       </div>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
 
-
-
-                       </div>
-                    </Popup>
-                  </Marker>
-})
-                }
-
-
-        {automaticLocation ? (
-          <>
-            {/* <MapContainer
-              center={[center.lat, center.lng]}
-              zoom={16}
-              scrollWheelZoom={true}
-              style={{ height: 500, width: "100%" }}
-            >
-              <ChangeView center={userLocation} />
-              <TileLayer
-                attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              /> */}
+          {automaticLocation ? (
+            <>
               <Marker
                 position={[userLocation.lat, userLocation.lng]}
-                icon={ icon==='vet'?  vetIcon:userIcon}
+                icon={icon === "vet" ? vetIcon : userIcon}
               >
                 <Popup>
-                  <div className="text-semi-blue text-bold text-xl">
-                  You
-                  </div>
-
+                  <div className="text-semi-blue text-bold text-xl">You</div>
                 </Popup>
               </Marker>
-            {/* </MapContainer> */}
-          </>
-        ) : (
-          <>
-
-              {/* <Marker position={[newLocation[1], newLocation[0]]}>
-          <Popup>
-            A pretty CSS3 popup. <br /> Easily customizable.
-          </Popup>
-        </Marker> */}
-
-              {/* {newLocation && (
-          <DraggableMarker location={[newLocation, setNewLocation]} />
-        )} */}
-
-              <DraggableMarker location={[userLocation, setUserLocation]} icon={ icon==='vet'?  vetIcon:userIcon} />
-
-              {/* <Marker position={[23.7461, 90.3742]}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>  */}
+            </>
+          ) : (
+            <>
+              <DraggableMarker
+                location={[userLocation, setUserLocation]}
+                icon={icon === "vet" ? vetIcon : userIcon}
+              />
 
               <Search location={[userLocation, setUserLocation]} />
-
-          </>
-        )}
-
-</MapContainer>
+            </>
+          )}
+        </MapContainer>
       </div>
+      {query && (
+        <Button
+          onClick={() =>
+            query({
+              variables: {
+                limit: 10,
+                skip: 0,
+                sortBy: {
+                  sortBy: sortBy,
+                  lat: userLocation.lat,
+                  lng: userLocation.lng,
+                },
+              },
+            })
+          }
+          color="indigo"
+          className="mt-10 rounded-full"
+        >
+          Go
+        </Button>
+      )}
     </div>
   );
 };

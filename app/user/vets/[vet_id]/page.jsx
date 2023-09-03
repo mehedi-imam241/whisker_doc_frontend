@@ -1,11 +1,11 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Avatar, Card, Typography } from "@material-tailwind/react";
 import ButtonCustom from "@/components/Button";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { center } from "@/utils/location_center";
+import StarRatings from "react-star-ratings";
 const Map = dynamic(
   () => import("@/components/map"), // replace '@components/map' with your component's location
   { ssr: false } // This line is important. It's what prevents server-side render
@@ -47,17 +47,30 @@ const TABLE_ROWS = (params) => [
 // ];
 
 const GET_VET_INFO = gql`
-query GetVetInfo($vetId: String!) {
-  getVetInfo(vetId: $vetId) {
-    certificateId
-    degree
-    location {
-      lat
-      lng
+  query GetVetInfo($vetId: String!) {
+    getVetInfo(vetId: $vetId) {
+      certificateId
+      degree
+      location {
+        lat
+        lng
+      }
+      zoomLink
     }
-    zoomLink
   }
-}
+`;
+
+const FETCH_REVIEWS = gql`
+  query FindReviewsByVetId($vetId: String!) {
+    findReviewsByVetId(vetId: $vetId) {
+      comment
+      rating
+      user {
+        name
+        avatar
+      }
+    }
+  }
 `;
 
 const getVetInfo = (dataVetInfo) => {
@@ -67,7 +80,6 @@ const getVetInfo = (dataVetInfo) => {
       certificateId: "Not Provided",
       zoomLink: "Not Provided",
     };
-
   } else {
     return {
       degree: dataVetInfo.getVetInfo.degree,
@@ -77,10 +89,7 @@ const getVetInfo = (dataVetInfo) => {
   }
 };
 
-
 export default function Page({ params }) {
-
-
   const { loading, error, data } = useQuery(FETCH_VET, {
     variables: {
       getVetId: params.vet_id,
@@ -97,7 +106,23 @@ export default function Page({ params }) {
     },
   });
 
-  if (loadingVerify || loading) return <div>Loading...</div>;
+  const {
+    data: dataReviews,
+    loading: loadingReviews,
+    error: errorReviews,
+  } = useQuery(FETCH_REVIEWS, {
+    variables: {
+      vetId: params.vet_id,
+    },
+  });
+
+  useEffect(() => {
+    console.log(dataReviews);
+  }, [dataReviews]);
+
+  if (loadingVerify || loading || loadingReviews) return <div>Loading...</div>;
+
+  console;
 
   return (
     <div className={"text-center mb-20"}>
@@ -123,7 +148,10 @@ export default function Page({ params }) {
               <Card className="w-[550px] h-full overflow-auto">
                 <table className="w-full min-w-max table-auto text-left">
                   <tbody>
-                    {TABLE_ROWS({...data['getVet'],                    ...(getVetInfo(dataVetInfo)),}).map(({ name, job }, index) => {
+                    {TABLE_ROWS({
+                      ...data["getVet"],
+                      ...getVetInfo(dataVetInfo),
+                    }).map(({ name, job }, index) => {
                       const isLast = index === TABLE_ROWS.length - 1;
                       const classes = isLast
                         ? "p-4"
@@ -155,29 +183,66 @@ export default function Page({ params }) {
                   </tbody>
                 </table>
               </Card>
-
-              
-
-
-
-
             </div>
-
-
-
-
-
-
           </div>
+
+          {dataReviews && dataReviews.findReviewsByVetId.length > 0 && (
+            <div className={"text-left mt-20 mx-[10%]"}>
+              <h2
+                className={
+                  " text-2xl font-bold text-semi-blue mb-10 text-center"
+                }
+              >
+                Reviews
+              </h2>
+              <div className={"flex flex-col"}>
+                {dataReviews.findReviewsByVetId.map((review, index) => (
+                  <div
+                    className="pt-4 h-[150px] px-5 shadow-lg rounded-lg w-full"
+                    key={index}
+                  >
+                    <div className="my-5 flex gap-2 justify-between">
+                      <div className="flex gap-2 justify-start items-center">
+                        <Avatar
+                          alt="avatar"
+                          src={review.user.avatar}
+                          className="border border-primary shadow-xl shadow-primary ring-4 ring-primary w-[30px] h-[30px] mr-2"
+                        />
+                        <h4 className="font-semibold text-semi-blue">
+                          {review.user.name}
+                        </h4>
+                      </div>
+                      <StarRatings
+                        rating={review.rating}
+                        numberOfStars={5}
+                        name="rating"
+                        starDimension="23px"
+                        starSpacing="1px"
+                        starRatedColor="#FF8A00"
+                      />
+                    </div>
+
+                    <div className="mt-5 mb-10 text-lg font-roboto ">
+                      {review.comment}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <h1 className={"text-2xl font-bold text-semi-blue my-16 text-center"}>
             Vet Location
           </h1>
           <div className="mx-[10%]">
-            {
-              dataVetInfo && dataVetInfo.getVetInfo? <Map userLocation={dataVetInfo.getVetInfo.location} update={false} /> : <p className="text-2xl text-red-500 -mt-10" >Not Provided</p>
-            }
-            
+            {dataVetInfo && dataVetInfo.getVetInfo ? (
+              <Map
+                userLocation={dataVetInfo.getVetInfo.location}
+                update={false}
+              />
+            ) : (
+              <p className="text-2xl text-red-500 -mt-10">Not Provided</p>
+            )}
           </div>
 
           <Link

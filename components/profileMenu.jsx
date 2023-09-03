@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Menu,
   MenuHandler,
@@ -5,14 +7,19 @@ import {
   MenuItem,
   Avatar,
   Typography,
-  
 } from "@material-tailwind/react";
 import Cookies from "js-cookie";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import MyAvatar from "@/components/Avatar";
+import { useSelector } from "react-redux";
 
 export function ProfileMenu({ editProfileLink }) {
+  const profile = useSelector((state) => state.user.profile);
+
+  console.log(profile);
+
   const router = useRouter();
   const [logout, setLogout] = useState(false);
   useEffect(() => {
@@ -24,20 +31,17 @@ export function ProfileMenu({ editProfileLink }) {
       Cookies.remove("accessToken", {
         path: "/",
         domain: "localhost",
-      }); 
+      });
       window.location.href = "/login";
     }
   }, [logout]);
-      
+
   return (
     <Menu>
       <MenuHandler>
-        <Avatar
-          variant="circular"
-          alt="tania andrew"
-          className="cursor-pointer"
-          src="https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1480&q=80"
-        />
+        <div className="hover:cursor-pointer">
+          <MyAvatar src={null || (profile && profile.avatar)} size={"45px"} />
+        </div>
       </MenuHandler>
       <MenuList>
         <MenuItem className="flex items-center gap-2">
@@ -129,10 +133,7 @@ export function ProfileMenu({ editProfileLink }) {
           </Typography>
         </MenuItem>
         <hr className="my-2 border-blue-gray-50" />
-        <MenuItem
-          className="flex items-center gap-2 "
-          onClick={setLogout}
-        >
+        <MenuItem className="flex items-center gap-2 " onClick={setLogout}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

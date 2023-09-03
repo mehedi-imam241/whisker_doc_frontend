@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useContext } from "react";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { gql, useMutation } from "@apollo/client";
@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import withReactContent from "sweetalert2-react-content";
 import Swal from "sweetalert2";
 import Cookies from "js-cookie";
+import { useDispatch } from "react-redux";
+import { setUser } from "@/redux/slices/user";
 
 const MySwal = withReactContent(Swal);
 
@@ -28,6 +30,9 @@ const LOGIN = gql`
 function Page(props) {
   const [Login, { data, loading, error }] = useMutation(LOGIN);
   const { push } = useRouter();
+
+  const dispatch = useDispatch();
+
   const {
     register,
     handleSubmit,
@@ -47,6 +52,8 @@ function Page(props) {
 
       Cookies.set("accessToken", data.login.accessToken);
       Cookies.set("user", JSON.stringify(data.login.user));
+
+      dispatch(setUser(data.login.user));
 
       if (data.login.user.role === "USER") {
         await push("/user");
