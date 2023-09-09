@@ -33,7 +33,12 @@ Font.register({
 const styles = StyleSheet.create({
   PDFViewer: { width: "100%", height: "80vh" },
   Document: { width: "100%", height: "100%", fontFamily: "Roboto" },
-  page: { width: "100%", height: "100%",paddingTop: "30px", paddingBottom: "30px"},
+  page: {
+    width: "100%",
+    height: "100%",
+    paddingTop: "30px",
+    paddingBottom: "30px",
+  },
   section: { textAlign: "center", margin: 30 },
   rowView: {
     fontSize: 14,
@@ -47,9 +52,7 @@ const styles = StyleSheet.create({
 });
 
 // Create Document Component
-const MyDocument = ({prescription,appointment}) => {
-
-
+const MyDocument = ({ prescription, appointment }) => {
   const tableData = {
     column: ["name", "dose", "duration"],
   };
@@ -69,7 +72,7 @@ const MyDocument = ({prescription,appointment}) => {
     },
     {
       Name: "Date",
-      Data: appointment.date.substring(0,10),
+      Data: appointment.date.substring(0, 10),
     },
 
     {
@@ -90,7 +93,6 @@ const MyDocument = ({prescription,appointment}) => {
     },
   ];
 
-
   return (
     <Document style={styles.Document}>
       <Page size="A4" style={styles.page}>
@@ -101,13 +103,13 @@ const MyDocument = ({prescription,appointment}) => {
         </View>
 
         <Image
-          src="https://th.bing.com/th/id/OIP.kD-ISqjfhq_q0oMg3v4XZgHaH8?pid=ImgDet&rs=1"
+          src={appointment.pet.avatar || "/assets/pet.svg"}
           style={{
             width: "100px",
             height: "100px",
             marginLeft: "auto",
             marginRight: "auto",
-            borderRadius: "3px",
+            borderRadius: "100px",
             marginBottom: "30",
           }}
           alt="pet image"
@@ -179,18 +181,14 @@ const MyDocument = ({prescription,appointment}) => {
               Symptoms
             </Text>
             <View style={{ display: "flex", flexDirection: "column" }}>
-
-              {
-                prescription.symptoms.map((symptom)=> {
-                  return <View style={{ flexDirection: "row", marginBottom: 4 }}>
-                  <Text style={{ marginHorizontal: 8 }}>•</Text>
-                  <Text>{symptom}</Text>
-                </View>
-                })
-              }
-
-
-
+              {prescription.symptoms.map((symptom) => {
+                return (
+                  <View style={{ flexDirection: "row", marginBottom: 4 }}>
+                    <Text style={{ marginHorizontal: 8 }}>•</Text>
+                    <Text>{symptom}</Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
           <View>
@@ -205,36 +203,27 @@ const MyDocument = ({prescription,appointment}) => {
               Diseases
             </Text>
             <View style={{ display: "flex", flexDirection: "column" }}>
-            {
-                prescription.diseases.map((disease)=> {
-                  return <View style={{ flexDirection: "row", marginBottom: 4 }}>
-                  <Text style={{ marginHorizontal: 8 }}>•</Text>
-                  <Text>{disease}</Text>
-                </View>
-                })
-              }
+              {prescription.diseases.map((disease) => {
+                return (
+                  <View style={{ flexDirection: "row", marginBottom: 4 }}>
+                    <Text style={{ marginHorizontal: 8 }}>•</Text>
+                    <Text>{disease}</Text>
+                  </View>
+                );
+              })}
             </View>
           </View>
         </View>
 
-
-
         <View style={styles.section}>
-          <Text style={{ color: "orange", fontWeight: "bold" }}>
-            Medicines
-          </Text>
-
-          
+          <Text style={{ color: "orange", fontWeight: "bold" }}>Medicines</Text>
         </View>
 
         <Fragment>
-
-
-
           <View style={styles.rowView}>
-            {tableData["column"].map((c,index) => (
+            {tableData["column"].map((c, index) => (
               <Text
-              key={index}
+                key={index}
                 style={{
                   width: `${100 / tableData["column"].length}%`,
                   backgroundColor: "#2f327d",
@@ -253,7 +242,7 @@ const MyDocument = ({prescription,appointment}) => {
               <View style={styles.rowView}>
                 {tableData["column"].map((c) => (
                   <Text
-                  key={index}
+                    key={index}
                     style={{
                       width: `${100 / tableData["column"].length}%`,
                       backgroundColor: index % 2 == 0 ? "white" : "#f2f2f2",
@@ -269,24 +258,25 @@ const MyDocument = ({prescription,appointment}) => {
           ))}
         </Fragment>
 
-
         <View style={styles.section}>
-          <Text style={{ color: "orange", fontWeight: "bold", marginTop: "20px" }}>
+          <Text
+            style={{ color: "orange", fontWeight: "bold", marginTop: "20px" }}
+          >
             Advice
           </Text>
 
-
-          <Text style={{ marginTop: "20px", fontSize: "14px", textAlign: "left" }}>
+          <Text
+            style={{ marginTop: "20px", fontSize: "14px", textAlign: "left" }}
+          >
             {prescription.advice}
           </Text>
-          
         </View>
       </Page>
     </Document>
   );
 };
 
-export default function MyPDF({prescription,appointment}) {
+export default function MyPDF({ prescription, appointment }) {
   return (
     <PDFViewer style={styles.PDFViewer}>
       <MyDocument prescription={prescription} appointment={appointment} />

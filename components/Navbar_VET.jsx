@@ -119,7 +119,7 @@ export default function CustomNavbar() {
           />
         </Link>
 
-        <div className="hidden 2xl:block mt-3">{navList}</div>
+        <div className="hidden 2xl:block">{navList}</div>
 
         <ProfileMenu editProfileLink={"/vet/edit-profile"} />
 

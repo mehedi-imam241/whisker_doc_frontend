@@ -1,14 +1,7 @@
 "use client";
 import React, { useEffect, useState, useContext } from "react";
 import { gql, useMutation, useQuery, useLazyQuery } from "@apollo/client";
-import {
-  Avatar,
-  Button,
-  Card,
-  Input,
-  Typography,
-  avatar,
-} from "@material-tailwind/react";
+import { Card, Typography } from "@material-tailwind/react";
 import Cookies from "js-cookie";
 import ButtonCustom from "@/components/Button";
 import Link from "next/link";
@@ -116,18 +109,21 @@ const getVetInfo = (dataVetInfo) => {
   }
 };
 
+const GET_APPOINTMENTCOUNT = gql`
+  query GetAppointmentCountOfVet {
+    getAppointmentCountOfVet {
+      count
+    }
+  }
+`;
+
 export default function Page() {
   const user = useSelector(({ user }) => user.profile);
 
-  const [getVet, { loading, error, data }] = useLazyQuery(
-    FETCH_VET
-    //   ,
-    //   {
-    //   variables: {
-    //     getVetId: USER._id,
-    //   },
-    // }
-  );
+  const [getVet, { loading, error, data }] = useLazyQuery(FETCH_VET);
+
+  const { data: appointmentCount, loading: loadingAppointmentCount } =
+    useQuery(GET_APPOINTMENTCOUNT);
 
   const dispatch = useDispatch();
 
@@ -153,7 +149,6 @@ export default function Page() {
 
   const handleChange = (file) => {
     uploadCloudinary(file).then((res) => {
-      console.log(res);
       uploadAvatar({
         variables: {
           avatar: res.data.secure_url,
@@ -162,10 +157,6 @@ export default function Page() {
         .then(({ data }) => {
           if (data.uploadUserAvatar.success) {
             setSrc(res.data.secure_url);
-            // Cookies.set(
-            //   "user",
-            //   JSON.stringify({ ...USER, avatar: res.data.secure_url })
-            // );
 
             dispatch(setUser({ ...user, avatar: res.data.secure_url }));
 
@@ -199,7 +190,8 @@ export default function Page() {
   const { data: dataVetInfo, loading: loadingVetInfo } =
     useQuery(FETCH_VET_INFO);
 
-  if (loadingSlot || loading || loadingVetInfo) return <p>Loading...</p>;
+  if (loadingSlot || loading || loadingVetInfo || loadingAppointmentCount)
+    return <p>Loading...</p>;
 
   return (
     <div className={"text-center "}>
@@ -234,6 +226,10 @@ export default function Page() {
             </FileUploader>
 
             <Card className="w-[700px] h-full overflow-auto">
+              <div className="bg-semi-blue rounded-full px-5 py-3 text-white mb-5">
+                Completed Appointments:{" "}
+                {appointmentCount.getAppointmentCountOfVet.count}
+              </div>
               <table className="w-full min-w-max table-auto text-left">
                 <tbody>
                   {TABLE_ROWS({

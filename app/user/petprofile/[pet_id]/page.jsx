@@ -1,7 +1,19 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { gql, useQuery } from "@apollo/client";
 import { Avatar, Card, Typography } from "@material-tailwind/react";
+import { BsFillCameraFill } from "react-icons/bs";
+import { FileUploader } from "react-drag-drop-files";
+import imageTypes from "@/utils/imageTypes";
+import MyAvatar from "@/components/Avatar";
+import { uploadCloudinary } from "@/utils/uploadCloudinary";
+
+import withReactContent from "sweetalert2-react-content";
+import Swal from "sweetalert2";
+
+import { useMutation } from "@apollo/client";
+
+const MySwal = withReactContent(Swal);
 
 const FETCH_PET = gql`
   query GetPetById($_id: String!) {
@@ -14,6 +26,15 @@ const FETCH_PET = gql`
       name
       species
       weight
+    }
+  }
+`;
+
+const UPLOAD_AVATAR = gql`
+  mutation UploadPetAvatar($avatar: String!, $petId: String!) {
+    uploadPetAvatar(avatar: $avatar, petId: $petId) {
+      message
+      success
     }
   }
 `;
@@ -55,6 +76,52 @@ export default function Page({ params }) {
       _id: params.pet_id,
     },
   });
+
+  const [uploadAvatar] = useMutation(UPLOAD_AVATAR);
+  const [src, setSrc] = useState(null);
+  useEffect(() => {
+    if (data && data.getPetById.avatar) {
+      setSrc(data.getPetById.avatar);
+    }
+  }, [data]);
+
+  const handleChange = (file) => {
+    uploadCloudinary(file).then((res) => {
+      uploadAvatar({
+        variables: {
+          petId: params.pet_id,
+          avatar: res.data.secure_url,
+        },
+      })
+        .then(({ data }) => {
+          console.log(data);
+          if (data.uploadPetAvatar.success) {
+            setSrc(res.data.secure_url);
+
+            MySwal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Avatar updated successfully",
+            });
+          } else {
+            MySwal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "Something went wrong!",
+            });
+          }
+        })
+        .catch((e) => {
+          console.log(e);
+          MySwal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+          });
+        });
+    });
+  };
+
   return (
     <div className={"text-center"}>
       {loading && <p>Loading...</p>}
@@ -70,17 +137,18 @@ export default function Page({ params }) {
               "text-center flex flex-col lg:flex-row justify-around items-center gap-y-10"
             }
           >
-            <Avatar
-              alt="avatar"
-              src="/assets/pet.svg"
-              className="border border-primary shadow-xl shadow-primary ring-4 ring-primary w-[300px] h-[300px] "
-            />
-            {/*<img*/}
-            {/*  // src={data.getPetById.avatar}*/}
-
-            {/*  alt="pet-avatar"*/}
-            {/*  className={"w-[200px]"}*/}
-            {/*/>*/}
+            <FileUploader
+              handleChange={handleChange}
+              name="file"
+              types={imageTypes}
+            >
+              <div className="relative hover:cursor-pointer">
+                <MyAvatar pet={true} src={src} />
+                <div className="rounded-full absolute bottom-5 right-5 p-1 bg-gray-50">
+                  <BsFillCameraFill size={30} className=" text-primary" />
+                </div>
+              </div>
+            </FileUploader>
             <Card className="w-[550px] h-full overflow-auto">
               <table className="w-full min-w-max table-auto text-left">
                 <tbody>

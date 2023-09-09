@@ -16,9 +16,7 @@ import { ProfileMenu } from "@/components/profileMenu";
 const navLinks = [
   { title: "Vets", link: "/user/vets" },
   { title: "Symptoms", link: "/user/symptoms" },
-  { title: "Home Service", link: "/user/home-service" },
   { title: "Subscription", link: "/user/subscription" },
-  { title: "Review", link: "/user/review" },
   { title: "Blogs", link: "/user/blogs" },
 ];
 
@@ -30,7 +28,7 @@ export default function CustomNavbar() {
   useEffect(() => {
     window.addEventListener(
       "resize",
-      () => window.innerWidth >= 654 && setOpenNav(false),
+      () => window.innerWidth >= 654 && setOpenNav(false)
     );
 
     window.onscroll = function () {
@@ -121,7 +119,7 @@ export default function CustomNavbar() {
           />
         </Link>
 
-        <div className="hidden 2xl:block mt-3">{navList}</div>
+        <div className="hidden 2xl:block">{navList}</div>
 
         <ProfileMenu />
 

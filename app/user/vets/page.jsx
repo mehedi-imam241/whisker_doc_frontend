@@ -74,6 +74,8 @@ function PageUtils(props) {
     }
   );
 
+  console.log(data);
+
   useEffect(() => {
     getAllVetsByLocation({
       variables: {
@@ -103,11 +105,30 @@ function PageUtils(props) {
                   ? "Sort By Distance"
                   : sortBy === "EXPERIENCE"
                   ? "Sort By Experience"
+                  : sortBy === "LASTNAME"
+                  ? "Sort By Last Name"
                   : "Sort By Ratings"}
               </Button>
             </div>
           </MenuHandler>
           <MenuList>
+            <MenuItem
+              onClick={() => {
+                setSortBy("LASTNAME");
+                return getAllVetsByLocation({
+                  variables: {
+                    limit: 10,
+                    skip: 0,
+                    sortBy: {
+                      sortBy: "LASTNAME",
+                    },
+                  },
+                });
+              }}
+            >
+              Sort By Last Name
+            </MenuItem>
+
             <MenuItem
               onClick={() => {
                 setSortBy("DURATION");

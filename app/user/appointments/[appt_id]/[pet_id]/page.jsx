@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { Avatar, Button, Card, Typography } from "@material-tailwind/react";
 import slots from "@/utils/slots";
@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import StarRatings from "react-star-ratings";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import MyAvatar from "@/components/Avatar";
 
 const MySwal = withReactContent(Swal);
 const PDFViewer = dynamic(() => import("@/components/pdf"), { ssr: false });
@@ -18,6 +19,7 @@ const FETCH_APPOINTMENT = gql`
     getAppointmentDetails(apptId: $apptId) {
       date
       pet {
+        avatar
         name
         breed
         age
@@ -115,6 +117,12 @@ function Page({ params }) {
 
   const [rating, setRating] = React.useState(5);
   const [comment, setComment] = React.useState("");
+
+  useEffect(() => {
+    if (reviewData) {
+      console.log(reviewData);
+    }
+  }, [reviewData]);
   if (loading || reviewLoading) return <p>Loading...</p>;
 
   const handleSubmitReview = async () => {
@@ -130,7 +138,7 @@ function Page({ params }) {
         },
       });
 
-      if (reviewData.success) {
+      if (reviewData.createReview.success) {
         await MySwal.fire({
           icon: "success",
           title: "Success",
@@ -164,9 +172,10 @@ function Page({ params }) {
 
           <div
             className={
-              "text-center flex flex-col lg:flex-row justify-center items-center gap-y-10"
+              "text-center flex flex-col lg:flex-row justify-around items-center gap-y-10"
             }
           >
+            <MyAvatar pet={true} src={data.getAppointmentDetails.pet.avatar} />
             {/*<img*/}
             {/*  // src={data.getPetById.avatar}*/}
 
