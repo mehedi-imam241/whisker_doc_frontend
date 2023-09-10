@@ -13,7 +13,6 @@ export default function DashboardLayout({ children }) {
     if (user) {
       dispatch(setUser(JSON.parse(user)));
     }
-    console.log(user);
   }, []);
 
   return (

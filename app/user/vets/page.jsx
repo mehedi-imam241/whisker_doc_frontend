@@ -22,6 +22,7 @@ import { RiPinDistanceFill } from "react-icons/ri";
 import { BsFillClockFill, BsFillPeopleFill } from "react-icons/bs";
 import { MdModeComment, MdPeople } from "react-icons/md";
 import StarRatings from "react-star-ratings";
+import MyAvatar from "@/components/Avatar";
 
 const GET_VETS = gql`
   query GetAllVetsByLocation(
@@ -73,8 +74,6 @@ function PageUtils(props) {
       fetchPolicy: "network-only",
     }
   );
-
-  console.log(data);
 
   useEffect(() => {
     getAllVetsByLocation({
@@ -206,12 +205,7 @@ function PageUtils(props) {
                 floated={false}
                 className="h-64 flex items-center justify-center"
               >
-                <Avatar
-                  src="/assets/user.png"
-                  alt="avatar"
-                  withBorder={true}
-                  className="p-0.5 w-60  h-60"
-                />
+                <MyAvatar src={vetInfo.vet.avatar} size="200px" />
               </CardHeader>
               <CardBody>
                 <div className="mb-2 flex items-center justify-between">

@@ -18,8 +18,6 @@ import { useSelector } from "react-redux";
 export function ProfileMenu({ editProfileLink }) {
   const profile = useSelector((state) => state.user.profile);
 
-  console.log(profile);
-
   const router = useRouter();
   const [logout, setLogout] = useState(false);
   useEffect(() => {

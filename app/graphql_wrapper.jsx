@@ -35,8 +35,8 @@ const client = new ApolloClient({
 
 export default function GraphQLWrapper({ children }) {
   return (
-    <ApolloProvider client={client}>
-      <Provider store={store}>{children}</Provider>
-    </ApolloProvider>
+    <Provider store={store}>
+      <ApolloProvider client={client}>{children}</ApolloProvider>
+    </Provider>
   );
 }

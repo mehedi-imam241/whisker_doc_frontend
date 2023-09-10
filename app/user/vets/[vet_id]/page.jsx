@@ -6,6 +6,7 @@ import ButtonCustom from "@/components/Button";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import StarRatings from "react-star-ratings";
+import MyAvatar from "@/components/Avatar";
 const Map = dynamic(
   () => import("@/components/map"), // replace '@components/map' with your component's location
   { ssr: false } // This line is important. It's what prevents server-side render
@@ -116,18 +117,12 @@ export default function Page({ params }) {
     },
   });
 
-  useEffect(() => {
-    console.log(dataReviews);
-  }, [dataReviews]);
-
   if (loadingVerify || loading || loadingReviews) return <div>Loading...</div>;
 
   console;
 
   return (
     <div className={"text-center mb-20"}>
-      {/* {loading && <p>Loading...</p>} */}
-
       {data && (
         <>
           <h2 className={" text-2xl font-bold text-semi-blue mb-10"}>
@@ -139,11 +134,8 @@ export default function Page({ params }) {
               "text-center flex flex-col lg:flex-row justify-around items-center gap-y-10"
             }
           >
-            <Avatar
-              alt="avatar"
-              src="/assets/user.png"
-              className="border border-primary shadow-xl shadow-primary ring-4 ring-primary w-[300px] h-[300px] "
-            />
+            <MyAvatar src={data["getVet"].avatar} size="300px" />
+
             <div className={"flex flex-col justify-center items-center"}>
               <Card className="w-[550px] h-full overflow-auto">
                 <table className="w-full min-w-max table-auto text-left">
@@ -203,11 +195,7 @@ export default function Page({ params }) {
                   >
                     <div className="my-5 flex gap-2 justify-between">
                       <div className="flex gap-2 justify-start items-center">
-                        <Avatar
-                          alt="avatar"
-                          src={review.user.avatar}
-                          className="border border-primary shadow-xl shadow-primary ring-4 ring-primary w-[30px] h-[30px] mr-2"
-                        />
+                        <MyAvatar src={review.user.avatar} size="30px" />
                         <h4 className="font-semibold text-semi-blue">
                           {review.user.name}
                         </h4>

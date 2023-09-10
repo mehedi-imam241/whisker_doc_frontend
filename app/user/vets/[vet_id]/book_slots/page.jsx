@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import slots from "@/utils/slots";
 import {
@@ -10,8 +10,13 @@ import {
   Select,
   Typography,
 } from "@material-tailwind/react";
+import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import MyAvatar from "@/components/Avatar";
+import { setReturnUrl } from "@/redux/slices/return_url.stripe";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 const MySwal = withReactContent(Swal);
 
@@ -51,6 +56,15 @@ const FETCH_VET = gql`
   }
 `;
 
+const CHECK_SUBSCRIPTION = gql`
+  query CheckIfSubscriptionActive {
+    checkIfSubscriptionActive {
+      message
+      success
+    }
+  }
+`;
+
 const TABLE_ROWS = (params) => [
   {
     name: "VET Name",
@@ -76,6 +90,7 @@ function Page({ params }) {
 
   const [type, setType] = useState("");
   const [petId, setPetId] = useState("");
+  const router = useRouter();
 
   const { data, loading, error } = useQuery(FIND_SLOTS, {
     variables: {
@@ -96,10 +111,37 @@ function Page({ params }) {
     },
   });
 
+  const { data: dataSubscription, loading: loadingSubscription } =
+    useQuery(CHECK_SUBSCRIPTION);
+
   const [bookAppointment] = useMutation(CREATE_APPOINTMENT);
 
-  if (loading || petsLoading || loadingVET) return <p>Loading...</p>;
-  if (error || petsError) return <p>Error :(</p>;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (
+      dataSubscription &&
+      !dataSubscription.checkIfSubscriptionActive.success
+    ) {
+      MySwal.fire({
+        icon: "info",
+        title: "Subscription Needed",
+        text: "You need to have an active subscription to book an appointment",
+      }).then(() => {
+        dispatch(setReturnUrl("/user/vets/" + params.vet_id + "/book_slots"));
+        // redirect("/user/products");
+        router.push("/user/products");
+      });
+
+      // .then(() => {
+      //   window.location.href = "/user/products";
+      // });
+      // console.log("from use Effect", return_url);
+    }
+  }, [dataSubscription]);
+
+  if (loading || petsLoading || loadingVET || loadingSubscription)
+    return <p>Loading...</p>;
 
   const handleSubmit = async () => {
     if (!date || slot === undefined || !type || !petId) {
@@ -173,11 +215,8 @@ function Page({ params }) {
           "text-center flex flex-col lg:flex-row justify-around items-center gap-y-10 mb-20"
         }
       >
-        <Avatar
-          alt="avatar"
-          src="/assets/user.png"
-          className="border border-primary shadow-xl shadow-primary ring-4 ring-primary w-[200px] h-[200px] "
-        />
+        <MyAvatar src={dataVET.getVet.avatar} size="200px" />
+
         <Card className="w-[550px] h-full overflow-auto">
           <table className="w-full min-w-max table-auto text-left">
             <tbody>
@@ -277,7 +316,11 @@ function Page({ params }) {
       </div>
 
       <div className={"text-center mt-10"}>
-        <Button color={"orange"} onClick={handleSubmit}>
+        <Button
+          color={"orange"}
+          onClick={handleSubmit}
+          disabled={!dataSubscription.checkIfSubscriptionActive.success}
+        >
           Book
         </Button>
       </div>

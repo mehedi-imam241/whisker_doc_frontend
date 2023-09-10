@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import userReducer from "../slices/user";
+import stripeReducer from "../slices/return_url.stripe";
 
 // import storage from "redux-persist/lib/storage";
 
@@ -13,6 +14,7 @@ import userReducer from "../slices/user";
 
 const reducer = combineReducers({
   user: userReducer,
+  stripe: stripeReducer,
 });
 
 // const persistedReducer = persistReducer(persistConfig, reducer);

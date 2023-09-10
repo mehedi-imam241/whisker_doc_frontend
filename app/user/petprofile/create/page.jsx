@@ -61,8 +61,6 @@ function Page(props) {
         },
       });
 
-      console.log(res);
-
       await MySwal.fire({
         title: "Success!",
         text: res.data.createPet.message,
@@ -70,7 +68,7 @@ function Page(props) {
         confirmButtonText: "Ok",
       });
     } catch (e) {
-      console.log(e);
+
       await MySwal.fire({
         title: "Error!",
         text: "Something went wrong",

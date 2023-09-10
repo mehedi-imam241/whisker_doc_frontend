@@ -63,7 +63,7 @@ function Page(props) {
         await push("/admin");
       }
     } catch (e) {
-      console.log(e);
+
       await MySwal.fire({
         title: "Error!",
         text: "Something went wrong",

@@ -112,7 +112,6 @@ export default function Page({ params }) {
           }
         })
         .catch((e) => {
-          console.log(e);
           MySwal.fire({
             icon: "error",
             title: "Oops...",
