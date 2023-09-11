@@ -1,8 +1,12 @@
+import WriteSymptoms from "@/components/WriteSymptoms";
 import React from "react";
-import WriteBlog from "@/components/WriteBlog";
+
 
 function Page(props) {
-  return <WriteBlog />;
+  return <div className="mx-[5%]">
+  <WriteSymptoms />;
+    </div>
+
 }
 
 export default Page;
