@@ -2,14 +2,19 @@
 import React, { useRef } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Button } from "@material-tailwind/react";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery, useLazyQuery } from "@apollo/client";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
 const MySwal = withReactContent(Swal);
 
+import TextField from "@mui/material/TextField";
+import Autocomplete from "@mui/material/Autocomplete";
+
+import Select from "react-select";
+
 const CREATE_SYMPTOMS = gql`
-mutation Mutation($input: CreateSymptomsInput!) {
+  mutation Mutation($input: CreateSymptomsInput!) {
     createSymptoms(input: $input) {
       message
       success
@@ -17,16 +22,120 @@ mutation Mutation($input: CreateSymptomsInput!) {
   }
 `;
 
+const SEARCH_SYMPTOMS_TAGS = gql`
+  query SearchSymptomsTags($input: String!) {
+    searchSymptomsTags(input: $input) {
+      Disease
+      Symptom
+    }
+  }
+`;
+
+const PetOptions = [
+  "Dog",
+  "Cat",
+  "Fish",
+  "Bird",
+  "Hamster",
+  "Rabbit",
+  "Guinea Pig",
+  "Turtle",
+  "Ferret",
+  "Chinchilla",
+  "Hedgehog",
+  "Parrot",
+  "Snake",
+  "Lizard",
+  "Gerbil",
+  "Mouse",
+  "Rat",
+  "Hermit Crab",
+  "Potbelly Pig",
+  "Sugar Glider",
+  "Tarantula",
+  "Cockatoo",
+  "Iguana",
+  "African Grey Parrot",
+  "Toucan",
+  "Capybara",
+  "Fennec Fox",
+  "Salamander",
+  "Axolotl",
+  "Betta Fish",
+  "Guppy",
+  "Goldfish",
+  "Budgerigar",
+  "African Clawed Frog",
+  "Gecko",
+  "Pigeon",
+  "Canary",
+  "Havanese",
+  "Persian Cat",
+  "Siamese Cat",
+  "Poodle",
+  "Bulldog",
+  "Siberian Husky",
+  "Rottweiler",
+  "Dachshund",
+  "Boxer",
+  "Great Dane",
+];
+
+export const options = [
+  { value: "ocean", label: "Ocean", color: "#00B8D9", isFixed: true },
+  { value: "blue", label: "Blue", color: "#0052CC", isDisabled: true },
+  { value: "purple", label: "Purple", color: "#5243AA" },
+  { value: "red", label: "Red", color: "#FF5630", isFixed: true },
+  { value: "orange", label: "Orange", color: "#FF8B00" },
+  { value: "yellow", label: "Yellow", color: "#FFC400" },
+  { value: "green", label: "Green", color: "#36B37E" },
+  { value: "forest", label: "Forest", color: "#00875A" },
+  { value: "slate", label: "Slate", color: "#253858" },
+  { value: "silver", label: "Silver", color: "#666666" },
+];
+
+const customStyles = {
+  control: (provided, state) => ({
+    ...provided,
+    background: "#fff",
+    borderColor: "#9e9e9e",
+    minHeight: "30px",
+    height: "55px",
+    boxShadow: state.isFocused ? null : null,
+  }),
+
+  valueContainer: (provided, state) => ({
+    ...provided,
+    height: "50px",
+    padding: "0 6px",
+  }),
+
+  input: (provided, state) => ({
+    ...provided,
+    margin: "0px",
+  }),
+  indicatorSeparator: (state) => ({
+    display: "none",
+  }),
+  indicatorsContainer: (provided, state) => ({
+    ...provided,
+    height: "50px",
+  }),
+};
+
 export default function WriteSymptoms(props) {
   const [createSymptoms] = useMutation(CREATE_SYMPTOMS);
 
   const [title, setTitle] = React.useState("");
-const [tags, setTags] = React.useState("");
+  const [tags, setTags] = React.useState([]);
   const [species, setSpecies] = React.useState("");
+  const [tagOptions, setTagOptions] = React.useState([]);
+
+  const [searchSymptomsTags] = useLazyQuery(SEARCH_SYMPTOMS_TAGS);
 
   const editorRef = useRef(null);
   const log = async () => {
-    if (title === "") {
+    if (title === "" || species === "" || tags.length === 0) {
       MySwal.fire({
         icon: "error",
         title: "Oops...",
@@ -44,71 +153,96 @@ const [tags, setTags] = React.useState("");
       return;
     }
 
+    const stringTags = tags.map((value) => {
+      return value.value;
+    });
+
     const res = await createSymptoms({
       variables: {
         input: {
-            "article": editorRef.current.getContent(),
-            "species": species,
-            "tags": tags,
-            "title": title,
+          article: editorRef.current.getContent(),
+          species: species,
+          tags: stringTags,
+          title: title,
         },
       },
     });
 
     await MySwal.fire({
       title: "Success!",
-      text: res.data.createBlog.message,
+      text: "Symptoms creation successfull. Waiting for approval",
       icon: "success",
       confirmButtonText: "Ok",
     });
 
-    window.location.href = `/vet/symptoms/${props.symptoms_id}`;
+    window.location.href = `/vet/symptoms/` + res.data.createSymptoms.message;
   };
+
   return (
     <div className={"text-center mb-10"}>
       <h1 className={"text-2xl text-semi-blue mb-6"}> Write Symptoms </h1>
 
-<div className="flex mb-5 gap-5">
+      <div className="flex mb-5 gap-5">
+        <TextField
+          variant="outlined"
+          label="Title"
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-[300px]"
+        />
+        <Autocomplete
+          disablePortal
+          id="combo-box-demo"
+          options={PetOptions}
+          sx={{ width: 300 }}
+          onChange={(e, v) => {
+            setSpecies(v);
+          }}
+          renderInput={(params) => (
+            <TextField
+              variant="outlined"
+              label="Species"
+              {...params}
+              className="w-[300px]"
+            />
+          )}
+        />
+        <div className="min-w-[300px] z-[500] justify-self-end ">
+          <Select
+            isMulti
+            name="colors"
+            options={tagOptions}
+            className="basic-multi-select"
+            classNamePrefix="Tags"
+            onChange={setTags}
+            onInputChange={(e) => {
+              searchSymptomsTags({
+                variables: {
+                  input: e,
+                },
+              }).then((res) => {
+                console.log(res.data.searchSymptomsTags);
 
+                const fetchedTags = [];
+                res.data.searchSymptomsTags.map((symptom) => {
+                  fetchedTags.push({
+                    value: symptom.Symptom,
+                    label: symptom.Symptom,
+                    color: "#666666",
+                  });
+                });
 
-      <input
-        className={"border border-w-2 border-gray-400 p-2.5 rounded-lg mb-6 w-[350px]"}
-        placeholder={"Title"}
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
+                console.log(fetchedTags);
 
+                setTagOptions(fetchedTags);
 
+                // res.data.searchSymptomsTags.
+              });
+            }}
+            styles={customStyles}
+          />
+        </div>
 
-<Autocomplete
-                disablePortal
-                id="combo-box-demo"
-                options={medicines}
-                sx={{ width: 300 }}
-                renderInput={(params) => (
-                  <TextField
-                    variant="standard"
-                    {...params}
-                    {...register(`medicines.${index}.name`, {
-                      onChange: async (e) => {
-                        const { data } = await searchDrug({
-                          variables: { query: e.target.value },
-                        });
-                        const fetchedMedicines = [];
-                        data.searchDrug.map((drug) => {
-                          fetchedMedicines.push(drug.Drug);
-                        });
-                        setMedicines(fetchedMedicines);
-                      },
-                    })}
-                    className="w-[300px]"
-                  />
-                )}
-              />
-
-
-
-{/* <Autocomplete
+        {/* <Autocomplete
                 disablePortal
                 id="combo-box-demo"
                 options={medicines}
@@ -133,9 +267,6 @@ const [tags, setTags] = React.useState("");
                   />
                 )}
               /> */}
-
-
-
       </div>
 
       <Editor
